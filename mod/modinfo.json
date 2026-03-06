@@ -1,0 +1,11 @@
+﻿{
+  "id": "shrub.rwsqol",
+  "name": "Speedrunning QOL",
+  "version": "0.1.0",
+  "authors": "shrubfromtomorrow",
+  "description": "A collection of quality of life changes targeted at improving speedunning.",
+  "tags": [],
+  "requirements": [],
+  "requirements_names": [],
+  "checksum_override_version": false
+}
