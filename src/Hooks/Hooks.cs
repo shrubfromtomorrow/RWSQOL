@@ -10,8 +10,6 @@ namespace RWSQOL.Hooks
     {
         public static void Apply()
         {
-            FastResetMenu.Apply();
-            FastResetGame.Apply();
             FastResetHandler.Apply();
             SaintPopcornTut.Apply();
         }

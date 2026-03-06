@@ -48,9 +48,14 @@ sealed class Plugin : BaseUnityPlugin
 
     public void Update()
     {
-        if (Input.anyKeyDown && Input.GetKeyDown(Plugin.Instance.options.FastResetGameKey.Value))
+        if (Input.anyKeyDown && Input.GetKeyDown(FastResetHandler.FastResetKey))
         {
             FastResetHandler.TriggerReset();
+            Plugin.Logger.LogInfo("Reset triggered");
         }
     }
 }
+
+// TODO: 
+// ADD SPRITE FOR HOLD IN-GAME
+// ADD COLOR CODING FOR SETTING LEGALITY (e.g. YELLOW FOR FAST RESET)

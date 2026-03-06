@@ -12,7 +12,9 @@ namespace RWSQOL.Enums
         {
             Idle,
             WaitingNextTick,
-            WaitingMenu,
+            HoldBegun,
+            HoldCompleted,
+            WaitingMenu
         }
     }
 }

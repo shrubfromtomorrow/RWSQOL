@@ -72,7 +72,7 @@ namespace RWSQOL.Hooks
         {
             ILCursor c = new ILCursor(il);
 
-            if (c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt(typeof(UnityEngine.Random), nameof(UnityEngine.Random.Range)), x => x.MatchLdloc(16)))
+            if (c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt(typeof(UnityEngine.Random), nameof(UnityEngine.Random.Range))))
             {
                 c.EmitDelegate<Func<int, int>>((originalRand) =>
                 {

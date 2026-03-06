@@ -13,20 +13,20 @@ namespace RWSQOL
 {
     public class Config : OptionInterface
     {
-        private bool FastResetGameKeyGreyed;
+        private bool FastResetKeyGreyed;
 
-        public readonly Configurable<bool> FastResetMenu;
-        public readonly Configurable<bool> FastResetGame;
-        public readonly Configurable<KeyCode> FastResetGameKey;
+        public readonly Configurable<bool> FastMenuReset;
+        public readonly Configurable<bool> FastGameReset;
+        public readonly Configurable<KeyCode> FastResetKey;
         public readonly Configurable<bool> SaintDetPopcorn;
 
         private UIelement[] options;
 
         public Config()
         {
-            FastResetMenu = config.Bind<bool>("FastResetMenu", true);
-            FastResetGame = config.Bind<bool>("FastResetGame", true);
-            FastResetGameKey = config.Bind<KeyCode>("FastResetGameKey", KeyCode.Backspace);
+            FastMenuReset = config.Bind<bool>("FastMenuReset", true);
+            FastGameReset = config.Bind<bool>("FastGameReset", true);
+            FastResetKey = config.Bind<KeyCode>("FastResetGameKey", KeyCode.Backspace);
             SaintDetPopcorn = config.Bind<bool>("SaintDetPopcorn", true);
         }
 
@@ -45,12 +45,12 @@ namespace RWSQOL
             {
                 title,
 
-                new OpLabel(10f, 530f, "Fast save restart (menu):") {alignment = FLabelAlignment.Left, description = "Special + map when selecting a slugcat: instantly restarts a campaign and skips cutscenes if applicable. Illegal for multi-campaign speedruns."},
-                new OpCheckBox(FastResetMenu, 151f, 527f),
+                new OpLabel(10f, 530f, "Fast save restart (menu):") {alignment = FLabelAlignment.Left, description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable. ILLEGAL FOR MULTI-CAMPAIGN SPEEDRUNS."},
+                new OpCheckBox(FastMenuReset, 151f, 527f),
+                new OpKeyBinder(FastResetKey, new Vector2(181f, 506f), new Vector2(110f, 20f), false) { description = "Keybind for game/menu fast restart" },
 
-                new OpLabel(10f, 495f, "Fast save restart (game):") {alignment = FLabelAlignment.Left, description = "Press and hold keyind in-game for 2 seconds to restart current campaign and skip cutscenes if applicable. Illegal for multi-campaign speedruns."},
-                new OpCheckBox(FastResetGame, 150f, 492f),
-                new OpKeyBinder(FastResetGameKey, new Vector2(180f, 488f), new Vector2(110f, 20f), false),
+                new OpLabel(10f, 495f, "Fast save restart (game):") {alignment = FLabelAlignment.Left, description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable. ILLEGAL FOR MULTI-CAMPAIGN SPEEDRUNS."},
+                new OpCheckBox(FastGameReset, 150f, 492f),
 
                 new OpLabel(10f, 460f, "Consistent Saint tutorial popcorn:") {alignment = FLabelAlignment.Left, description = "Make Saint tutorial popcorn always pop 5 seconds after entering SI_C02 for the first time, as though optimal RNG."},
                 new OpCheckBox(SaintDetPopcorn, 200f, 457f),
@@ -62,16 +62,23 @@ namespace RWSQOL
         {
             base.Update();
 
+            bool fastGameResetValue = false;
+            bool fastMenuResetValue = false;
+
             foreach (var item in Tabs[0].items)
             {
-                if (item is OpCheckBox b && b.cfgEntry == FastResetGame)
+                if (item is OpCheckBox b)
                 {
-                    FastResetGameKeyGreyed = b.GetValueBool();
+                    if (b.cfgEntry == FastGameReset) fastGameResetValue = b.GetValueBool();
+                    if (b.cfgEntry == FastMenuReset) fastMenuResetValue = b.GetValueBool();
                 }
+            }
 
-                if (item is OpKeyBinder k && (k.cfgEntry == FastResetGameKey))
+            foreach (var item in Tabs[0].items)
+            {
+                if (item is OpKeyBinder k && k.cfgEntry == FastResetKey)
                 {
-                    k.greyedOut = !FastResetGameKeyGreyed;
+                    k.greyedOut = !(fastGameResetValue || fastMenuResetValue);
                 }
             }
         }
