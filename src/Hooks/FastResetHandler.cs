@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System; 
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,19 +37,9 @@ namespace RWSQOL.Hooks
             On.RainWorldGame.RawUpdate += RainWorldGame_RawUpdate;
             On.RainWorldGame.ctor += RainWorldGame_ctor;
             On.Menu.SlugcatSelectMenu.Update += SlugcatSelectMenu_Update;
+            On.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctor;
+            IL.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctorIL;
             IL.Menu.SlugcatSelectMenu.StartGame += SlugcatSelectMenu_StartGame;
-        }
-
-        /// <summary>
-        /// Simple cleanup to make sure the phase is idle when beginning game.
-        /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        /// <param name="manager"></param>
-        private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
-        {
-            orig(self, manager);
-            phase = FastResetPhase.Idle;
         }
 
         /// <summary>
@@ -108,6 +98,44 @@ namespace RWSQOL.Hooks
         }
 
         /// <summary>
+        /// Simple cleanup to make sure phase is idle when entering select menu. Excludes when entering menu from in-game reset.
+        /// </summary>
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        /// <param name="manager"></param>
+        private static void SlugcatSelectMenu_ctor(On.Menu.SlugcatSelectMenu.orig_ctor orig, Menu.SlugcatSelectMenu self, ProcessManager manager)
+        {
+            orig(self, manager);
+            if (phase != FastResetPhase.WaitingMenu) phase = FastResetPhase.Idle;
+
+            foreach(var thing in self.slugcatColorOrder)
+            {
+                Plugin.Logger.LogInfo(thing);
+            }
+            Plugin.Logger.LogInfo("Selected slugcat: " + self.slugcatColorOrder[self.slugcatPageIndex]);
+        }
+
+        /// <summary>
+        /// Prevent the game from selecting a different slugcat's campaign if they are the only campaign with savedata.
+        /// Always select the campaign the player most recently began, regardless of savedata.
+        /// </summary>
+        /// <param name="il"></param>
+        private static void SlugcatSelectMenu_ctorIL(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+
+            if (c.TryGotoNext(x => x.MatchStfld(typeof(Menu.SlugcatSelectMenu), nameof(Menu.SlugcatSelectMenu.slugcatPageIndex))) && 
+                c.TryGotoPrev(MoveType.Before, x => x.MatchLdcI4(out _)))
+            {
+                c.Next.OpCode = OpCodes.Ldc_I4_M1;
+            }
+            else
+            {
+                Plugin.Logger.LogError("SlugcatSelectMenu_ctorIL failed to match: " + il);
+            }
+        }
+
+        /// <summary>
         /// Tracks how long the reset bind has been held for in-game and increments to completion. Once complete, the game is exited and the process is switched to the slugcat select menu
         /// alongside the FastResetHandler being put in a waiting for menu phase
         /// </summary>
@@ -151,6 +179,18 @@ namespace RWSQOL.Hooks
                 self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.SlugcatSelect);
                 phase = FastResetPhase.WaitingMenu;
             }
+        }
+
+        /// <summary>
+        /// Simple cleanup to make sure the phase is idle when beginning game.
+        /// </summary>
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        /// <param name="manager"></param>
+        private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
+        {
+            orig(self, manager);
+            phase = FastResetPhase.Idle;
         }
     }
 }

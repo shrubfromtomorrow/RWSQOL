@@ -53,9 +53,10 @@ sealed class Plugin : BaseUnityPlugin
             FastResetHandler.TriggerReset();
             Plugin.Logger.LogInfo("Reset triggered");
         }
+
     }
 }
 
-// TODO: 
+// TODO:
 // ADD SPRITE FOR HOLD IN-GAME
-// ADD COLOR CODING FOR SETTING LEGALITY (e.g. YELLOW FOR FAST RESET)
+// SAFETY TIMEOUT FOR RESET PHASE?
