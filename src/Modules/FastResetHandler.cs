@@ -9,7 +9,7 @@ using RWCustom;
 using static RWSQOL.Enums.Enums;
 using UnityEngine;
 
-namespace RWSQOL.Hooks
+namespace RWSQOL.Modules
 {
     /// <summary>
     /// This class handles whenever the reset keybind is pressed. It will either initiate, track, and complete a hold of the bind in-game to reset, or reset directly from the slugcat select menu.
@@ -107,12 +107,6 @@ namespace RWSQOL.Hooks
         {
             orig(self, manager);
             if (phase != FastResetPhase.WaitingMenu) phase = FastResetPhase.Idle;
-
-            foreach(var thing in self.slugcatColorOrder)
-            {
-                Plugin.Logger.LogInfo(thing);
-            }
-            Plugin.Logger.LogInfo("Selected slugcat: " + self.slugcatColorOrder[self.slugcatPageIndex]);
         }
 
         /// <summary>

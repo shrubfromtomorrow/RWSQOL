@@ -3,7 +3,7 @@ using BepInEx.Logging;
 using System.Security.Permissions;
 using System;
 using UnityEngine;
-using RWSQOL.Hooks;
+using RWSQOL.Modules;
 
 // Allows access to private members
 #pragma warning disable CS0618
@@ -37,7 +37,7 @@ sealed class Plugin : BaseUnityPlugin
 
         try
         {
-            Hooks.Main.Apply();
+            Modules.Main.Apply();
         }
         catch (Exception e)
         {

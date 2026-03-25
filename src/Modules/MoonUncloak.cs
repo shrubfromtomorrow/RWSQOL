@@ -10,7 +10,7 @@ using MonoMod.RuntimeDetour;
 using RWCustom;
 using UnityEngine;
 
-namespace RWSQOL.Hooks
+namespace RWSQOL.Modules
 {
     /// <summary>
     /// This class handles when Moon's cloak should appear in MS_FARSIDE. Restarting a campaign will mean it is always in place for any slugcat that can obtain it. 

@@ -9,7 +9,7 @@ using UnityEngine;
 using System.Configuration;
 using RWCustom;
 
-namespace RWSQOL.Hooks
+namespace RWSQOL.Modules
 {
     /// <summary>
     /// Remove randomness from Saint's tutorial popcorn. When you enter C02, this room script sets all popcorn plants in the room to be the cycle time + 200 ticks (5s) + 0-100 ticks random (0-2.5s).

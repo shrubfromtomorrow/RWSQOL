@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MonoMod.RuntimeDetour;
 
-namespace RWSQOL.Hooks
+namespace RWSQOL.Modules
 {
     public static class Main
     {
@@ -16,6 +16,7 @@ namespace RWSQOL.Hooks
             FastResetHandler.Apply();
             SaintPopcornTut.Apply();
             MoonUncloak.Apply();
+            WatcherIntroSkip.Apply();
         }
     }
 }
