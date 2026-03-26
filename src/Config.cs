@@ -11,6 +11,9 @@ namespace RWSQOL
 {
     public class Config : OptionInterface
     {
+        private OpTab mainTab;
+        private OpTab remixCheckTab;
+
         public readonly Configurable<bool> FastMenuReset;
         public readonly Configurable<bool> FastGameReset;
         public readonly Configurable<KeyCode> FastResetKey;
@@ -49,8 +52,10 @@ namespace RWSQOL
                 new ListItem("Torrential Railways", "Torrential Railways", 2)
             };
 
-            OpTab mainTab = new OpTab(this, "Main");
-            OpTab remixCheckTab = new OpTab(this, "Remix Check");
+            mainTab = new OpTab(this, "Main");
+            remixCheckTab = new OpTab(this, "Remix Check");
+            RemixCheck.RemixCheck.remixTab = remixCheckTab;
+            remixCheckTab.OnPostActivate += () => RemixCheck.RemixCheck.Populate();
 
             Tabs = new[] { mainTab, remixCheckTab };
 
@@ -89,8 +94,8 @@ namespace RWSQOL
             };
             mainTab.AddItems(mainTabOptions);
 
-            RemixCheck.RemixCheck.Populate(remixCheckTab);
-        }
+            //RemixCheck.RemixCheck.Populate();
+        } 
 
         public override void Update()
         {
