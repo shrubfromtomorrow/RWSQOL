@@ -1,8 +1,14 @@
 {
-  "WorkshopID": 0,
+  "WorkshopID": 3693000839,
   "LatestGameVersion": "v1.11.6",
   "UpdateTitle": true,
   "UpdateDescription": true,
-  "MarkAsPublic": true,
-  "Tags": []
+  "MarkAsPublic": false,
+  "Tags": [
+    "Game Mechanics",
+    "Tools",
+    "Base",
+    "Downpour",
+    "Watcher"
+  ]
 }

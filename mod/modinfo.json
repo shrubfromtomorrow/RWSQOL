@@ -3,8 +3,14 @@
   "name": "Speedrunning QOL",
   "version": "0.1.0",
   "authors": "shrubfromtomorrow",
-  "description": "A collection of quality of life changes targeted at improving speedunning.",
-  "tags": [],
+  "description": "A collection of quality of life changes targeted at improving speedunning the speedrunning experience. Legal for all speedrun.com runs.",
+  "tags": [
+    "Game Mechanics",
+    "Tools",
+    "Base",
+    "Downpour",
+    "Watcher"
+  ],
   "requirements": [],
   "requirements_names": [],
   "checksum_override_version": false
