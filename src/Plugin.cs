@@ -56,7 +56,3 @@ sealed class Plugin : BaseUnityPlugin
 
     }
 }
-
-// TODO:
-// ADD SPRITE FOR HOLD IN-GAME
-// SAFETY TIMEOUT FOR RESET PHASE?
