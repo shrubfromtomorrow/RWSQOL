@@ -8,6 +8,7 @@ using Mono.Cecil.Cil;
 using RWCustom;
 using static RWSQOL.Enums.Enums;
 using UnityEngine;
+using HUD;
 
 namespace RWSQOL.Modules
 {
@@ -23,6 +24,7 @@ namespace RWSQOL.Modules
 
         private const float HOLDDURATION = 1.5f; // 1.5 seconds hold time
         private static float heldTime;
+        private static float lastHeldTime;
 
         private static FastResetPhase phase = FastResetPhase.Idle;
         public static void TriggerReset()
@@ -40,6 +42,19 @@ namespace RWSQOL.Modules
             On.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctor;
             IL.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctorIL;
             IL.Menu.SlugcatSelectMenu.StartGame += SlugcatSelectMenu_StartGame;
+            On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
+        }
+
+        /// <summary>
+        /// Adds a ResetMeter to the hud in-game if toggled.
+        /// </summary>
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        /// <param name="cam"></param>
+        private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
+        {
+            orig(self, cam);
+            if (FastGameReset && cam.game.IsStorySession && !cam.game.rainWorld.ExpeditionMode) self.AddPart(new ResetMeter(self));
         }
 
         /// <summary>
@@ -139,7 +154,7 @@ namespace RWSQOL.Modules
         private static void RainWorldGame_RawUpdate(On.RainWorldGame.orig_RawUpdate orig, RainWorldGame self, float dt)
         {
             orig(self, dt);
-            if (!FastGameReset) return;
+            if (!FastGameReset || !self.IsStorySession || self.rainWorld.ExpeditionMode) return;
 
             if (phase == FastResetPhase.WaitingNextTick)
             {
@@ -150,6 +165,7 @@ namespace RWSQOL.Modules
             {
                 if (Input.anyKey && Input.GetKey(FastResetKey))
                 {
+                    lastHeldTime = heldTime;
                     heldTime += dt;
                     if (heldTime > HOLDDURATION)
                     {
@@ -159,7 +175,7 @@ namespace RWSQOL.Modules
                 }
                 else
                 {
-                    Plugin.Logger.LogInfo("Hold failed");
+                    Plugin.Logger.LogInfo("Hold failed: " + Time.time);
                     heldTime = 0f;
                     phase = FastResetPhase.Idle;
                 }
@@ -185,6 +201,90 @@ namespace RWSQOL.Modules
         {
             orig(self, manager);
             phase = FastResetPhase.Idle;
+        }
+
+        /// <summary>
+        /// This class is a visualizer for the progress on the held reset.
+        /// </summary>
+        private class ResetMeter : HudPart
+        {
+            public Vector2 pos;
+            public Vector2 lastPos;
+            public FSprite startLineSprite;
+            public FSprite endLineSprite;
+            public const float SEPARATIONDIST = 200f;
+
+            public FContainer fContainer
+            {
+                get
+                {
+                    return this.hud.fContainers[1];
+                }
+            }
+
+            public ResetMeter(HUD.HUD hud) : base(hud)
+            {
+
+                this.pos = new Vector2((float)((int)((this.hud.rainWorld.options.ScreenSize.x / 2f) - (SEPARATIONDIST / 2f))) + 4.2f, (float)((int)(this.hud.rainWorld.options.ScreenSize.y - (12f)) + 0.2f));
+                this.lastPos = this.pos;
+
+                this.startLineSprite = new FSprite("pixel", true);
+                this.startLineSprite.scaleX = 0f;
+                this.startLineSprite.scaleY = 10f;
+                this.fContainer.AddChild(this.startLineSprite);
+
+                this.endLineSprite = new FSprite("pixel", true);
+                this.endLineSprite.scaleX = 1.5f;
+                this.endLineSprite.scaleY = 10f;
+                this.fContainer.AddChild(this.endLineSprite);
+            }
+
+            public override void Draw(float timeStacker)
+            {
+                float level = Mathf.InverseLerp(0, HOLDDURATION, heldTime);
+                level = 1f - Mathf.Pow(1f - level, 2f);
+
+                float scale = level * SEPARATIONDIST;
+
+                this.startLineSprite.scaleX = scale;
+
+                float offset = scale * 0.5f;
+
+                this.startLineSprite.x = this.DrawPos(timeStacker).x + offset;
+                this.startLineSprite.y = this.DrawPos(timeStacker).y;
+                this.endLineSprite.x = this.DrawPos(timeStacker).x + SEPARATIONDIST + 2f;
+                this.endLineSprite.y = this.DrawPos(timeStacker).y;
+
+                this.startLineSprite.alpha = level;
+                this.endLineSprite.alpha = level;
+
+                Color startColor = Color.white;
+                Color targetColor;
+                if (hud.owner is Player p && p?.slugcatStats?.name != null)
+                {
+                    targetColor = PlayerGraphics.DefaultSlugcatColor(p.slugcatStats.name);
+                }
+                else
+                {
+                    // i likey this red
+                    targetColor = new Color(0.929f, 0.529f, 0.588f);
+                }
+                Color currentColor = Color.Lerp(startColor, targetColor, level);
+
+                this.startLineSprite.color = currentColor;
+                this.endLineSprite.color = currentColor;
+            }
+
+            public override void ClearSprites()
+            {
+                this.endLineSprite.RemoveFromContainer();
+                this.startLineSprite.RemoveFromContainer();
+            }
+
+            public Vector2 DrawPos(float timeStacker)
+            {
+                return this.pos;
+            }
         }
     }
 }

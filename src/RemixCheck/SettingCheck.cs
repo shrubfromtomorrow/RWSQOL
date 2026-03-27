@@ -51,6 +51,7 @@ namespace RWSQOL.RemixCheck
             }
             else
             {
+                Plugin.Logger.LogError($"Cannot find setting to evaluate in {ModName}: " + SettingKey);
                 result.IsValid = false;
             }
 

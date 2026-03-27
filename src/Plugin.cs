@@ -51,7 +51,7 @@ sealed class Plugin : BaseUnityPlugin
         if (Input.anyKeyDown && Input.GetKeyDown(FastResetHandler.FastResetKey))
         {
             FastResetHandler.TriggerReset();
-            Plugin.Logger.LogInfo("Reset triggered");
+            Plugin.Logger.LogInfo("Reset button pressed");
         }
 
     }

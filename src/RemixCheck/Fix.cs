@@ -83,6 +83,10 @@ namespace RWSQOL.RemixCheck
                     {
                         configItem.BoxedValue = ValueConverter.ConvertToValue(setting.Expected, configItem.settingType);
                     }
+                    else
+                    {
+                        Plugin.Logger.LogError($"Cannot find setting to fix in {setting.ModName}: " +  setting.SettingKey);
+                    }
                 }
                 oi.config.Save();
             }
@@ -112,6 +116,7 @@ namespace RWSQOL.RemixCheck
                     button.selectEnabled = true;
                 }
             }
+            //ConfigContainer.menuTab.modList.RefreshAllButtons();
             ModdingMenu.instance.Singal(null, "APPLYMODS");
         }
     }

@@ -17,6 +17,8 @@ namespace RWSQOL.Modules
             SaintPopcornTut.Apply();
             MoonUncloak.Apply();
             WatcherIntroSkip.Apply();
+            FixedSkipVoid.Apply();
+            SaintStomachSetup.Apply();
         }
     }
 }

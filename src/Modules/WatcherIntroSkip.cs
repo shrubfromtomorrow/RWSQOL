@@ -19,7 +19,7 @@ namespace RWSQOL.Modules
     public class WatcherIntroSkip
     {
         public static bool Toggled => Plugin.Instance.options.WatcherIntroSkip.Value;
-        public static string Region => Plugin.Instance.options.WISRegionString.Value;
+        public static string EntryRegion => Plugin.Instance.options.WISRegionString.Value;
         public static bool KarmaReinforced => Plugin.Instance.options.WISReinforcedKarma.Value;
         public static bool SpreadRot => Plugin.Instance.options.WISSpreadRot.Value;
 
@@ -35,12 +35,27 @@ namespace RWSQOL.Modules
         public static void Apply()
         {
             On.StoryGameSession.ctor += StoryGameSession_ctor;
+            On.Watcher.WarpPoint.NewWorldLoaded_Room += WarpPoint_NewWorldLoaded_Room;
+        }
+
+        /// <summary>
+        /// Typically room rotting is done as the cycle ends (newworldloaded is called then as well) and then pending is set to false when the new story session is made.
+        /// This tidies up the pending that is set to true when the story session is made so rotting is limited to the first region.
+        /// </summary>
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        /// <param name="newRoom"></param>
+        private static void WarpPoint_NewWorldLoaded_Room(On.Watcher.WarpPoint.orig_NewWorldLoaded_Room orig, WarpPoint self, Room newRoom)
+        {
+            orig(self, newRoom);
+            newRoom.world.game.GetStorySession.pendingSentientRotInfectionFromWarp = false;
         }
 
         /// <summary>
         /// Update savestate on construction to allow for landing in selected region with correct states.
         /// The core is warpPointTargetAfterWarpPointSave, which is set to the warp point data fudged using the regionToPO entry.
         /// The den position is also critically updated to allow for the player to be added to the room correctly as process switches to the game.
+        /// Most of this is sourced from WarpPoint.NewWorldLoaded().
         /// </summary>
         /// <param name="orig"></param>
         /// <param name="self"></param>
@@ -53,7 +68,7 @@ namespace RWSQOL.Modules
 
             if (self.game.manager.menuSetup.startGameCondition == ProcessManager.MenuSetup.StoryGameInitCondition.New)
             {
-                string[] POString = Regex.Split(regionToPO[Region], "><");
+                string[] POString = Regex.Split(regionToPO[EntryRegion], "><");
                 string denRoom = Regex.Split(POString[3], "~")[4].ToUpperInvariant(); // this makes me timbers shiver
 
                 PlacedObject po = new PlacedObject(PlacedObject.Type.None, null);
@@ -69,7 +84,13 @@ namespace RWSQOL.Modules
                 self.saveState.deathPersistentSaveData.minimumRippleLevel = 1f;
                 self.saveState.deathPersistentSaveData.rippleLevel = 1f;
                 self.saveState.deathPersistentSaveData.maximumRippleLevel = 1f;
+
+                self.warpsTraversedThisCycle++;
+                self.saveState.preserveWarpFatigueAfterWarpPointSave = 0;
+                self.saveState.miscWorldSaveData.hasSkippedFirstWarpFatigueTransfer = 1;
+
                 self.saveState.deathPersistentSaveData.reinforcedKarma = KarmaReinforced;
+
                 self.pendingSentientRotInfectionFromWarp = SpreadRot;
                 game.rainWorld.progression.SaveWorldStateAndProgression(false);
             }

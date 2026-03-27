@@ -24,6 +24,10 @@ namespace RWSQOL
         public List<ListItem> WISRegionList;
         public readonly Configurable<bool> WISReinforcedKarma;
         public readonly Configurable<bool> WISSpreadRot;
+        public readonly Configurable<bool> FixedSkipVoid;
+        public readonly Configurable<bool> CustomSaintStomach;
+        public readonly Configurable<string> CSSItemString;
+        public List<ListItem> CSSList;
 
 
         private UIelement[] mainTabOptions;
@@ -39,6 +43,9 @@ namespace RWSQOL
             WISRegionString = config.Bind<string>("WISRegionString", "Sunbaked Alley");
             WISReinforcedKarma = config.Bind<bool>("WISReinforcedKarma", true);
             WISSpreadRot = config.Bind<bool>("WISSpreadRot", true);
+            FixedSkipVoid = config.Bind<bool>("FixedSkipVoid", false);
+            CustomSaintStomach = config.Bind<bool>("CustomSaintStomach", false);
+            CSSItemString = config.Bind<string>("CSSItemString", "Lantern");
         }
 
         public override void Initialize()
@@ -50,6 +57,23 @@ namespace RWSQOL
                 new ListItem("Sunbaked Alley", "Sunbaked Alley", 0),
                 new ListItem("Coral Caves", "Coral Caves", 1),
                 new ListItem("Torrential Railways", "Torrential Railways", 2)
+            };
+
+            CSSList = new List<ListItem>
+            {
+                new ListItem("{ID}<oB>0<oA>BubbleGrass<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>1", "BubbleGrass", 1),
+                new ListItem("{ID}<oB>0<oA>DataPearl<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>", "DataPearl", 2),
+                new ListItem("{ID}<oB>0<oA>FirecrackerPlant<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "FirecrackerPlant", 3),
+                new ListItem("{ID}<oB>0<oA>FlareBomb<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "FlareBomb", 4),
+                new ListItem("{ID}<oB>0<oA>FlyLure<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "FlyLure", 5),
+                new ListItem("{ID}<cB>0<cA>SI_SAINTINTRO.-1<cA>", "Hazer", 6),
+                new ListItem("ID.-1.6984<oB>0<oA>Lantern<oA>SI_SAINTINTRO.18.5.-1", "Lantern", 0),
+                new ListItem("{ID}<oB>0<oA>PuffBall<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "PuffBall", 7),
+                new ListItem("{ID}<oB>0<oA>Rock<oA>SI_SAINTINTRO.18.5.-1", "Rock", 8),
+                new ListItem("{ID}<oB>0<oA>ScavengerBomb<oA>SI_SAINTINTRO.18.5.-1", "ScavengerBomb", 9),
+                new ListItem("{ID}<oB>0<oA>SporePlant<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>0<oA>0", "SporePlant", 10),
+                new ListItem("VultureGrub<cA>{ID}<cB>0<cA>SI_SAINTINTRO.-1<cA>", "VultureGrub", 11),
+                new ListItem("{ID}<oB>0<oA>WaterNut<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>0", "WaterNut", 12),
             };
 
             mainTab = new OpTab(this, "Main");
@@ -69,28 +93,35 @@ namespace RWSQOL
                 mainTitle,
                 separator,
 
-                new OpLabel(10f, 530f, "Fast save restart (menu):") {alignment = FLabelAlignment.Left, description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable"},
-                new OpCheckBox(FastMenuReset, 151f, 527f),
+                new OpCheckBox(FastMenuReset, 5f, 527f) { description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable" },
+                new OpLabel(37f, 530f, "Fast save restart (menu)") {alignment = FLabelAlignment.Left, description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable"},
                 new OpKeyBinder(FastResetKey, new Vector2(181f, 506f), new Vector2(110f, 20f), false) { description = "Keybind for game/menu fast restart" },
 
-                new OpLabel(10f, 495f, "Fast save restart (game):") {alignment = FLabelAlignment.Left, description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable"},
-                new OpCheckBox(FastGameReset, 150f, 492f),
+                new OpCheckBox(FastGameReset, 5f, 492f) { description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable" },
+                new OpLabel(37f, 495f, "Fast save restart (game)") {alignment = FLabelAlignment.Left, description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable"},
 
-                new OpLabel(10f, 460f, "Consistent Saint tutorial popcorn:") {alignment = FLabelAlignment.Left, description = "Make Saint tutorial popcorn always pop 5 seconds after entering SI_C02 for the first time, as though optimal RNG"},
-                new OpCheckBox(SaintDetPopcorn, 200f, 457f),
+                new OpCheckBox(SaintDetPopcorn, 5f, 457f) { description = "Make Saint tutorial popcorn always pop 5 seconds after entering SI_C02 for the first time, as though optimal RNG" },
+                new OpLabel(37f, 460f, "Consistent Saint tutorial popcorn") {alignment = FLabelAlignment.Left, description = "Make Saint tutorial popcorn always pop 5 seconds after entering SI_C02 for the first time, as though optimal RNG"},
 
-                new OpLabel(10f, 425f, "Moon cloak campaign independence:") {alignment = FLabelAlignment.Left, description = "Moon's cloak will always exist in MS_FARSIDE for slugcats that can obtain it when restarting a save. Actions taken in other campaigns have no effect in a given campaign"},
-                new OpCheckBox(MoonUncloak, 220f, 422f),
+                new OpCheckBox(MoonUncloak, 5f, 422f) { description = "Moon's cloak will always exist in MS_FARSIDE for slugcats that can obtain it when restarting a save. Actions taken in other campaigns have no effect in a given campaign" },
+                new OpLabel(37f, 425f, "Moon cloak campaign independence") {alignment = FLabelAlignment.Left, description = "Moon's cloak will always exist in MS_FARSIDE for slugcats that can obtain it when restarting a save. Actions taken in other campaigns have no effect in a given campaign"},
 
-                new OpLabel(10f, 390f, "Watcher Intro Skip:") {alignment = FLabelAlignment.Left, description = "Beginning Watcher's campaign will start Watcher in the selected starting region with the selected options"},
-                new OpCheckBox(WatcherIntroSkip, 123f, 387f),
+                new OpCheckBox(WatcherIntroSkip, 5f, 387f) { description = "Beginning Watcher's campaign will start Watcher in the selected starting region with the selected options" },
+                new OpLabel(37f, 390f, "Watcher Intro Skip") {alignment = FLabelAlignment.Left, description = "Beginning Watcher's campaign will start Watcher in the selected starting region with the selected options"},
                 new OpComboBox(WISRegionString, new Vector2(153f, 387f), 150f, WISRegionList) { description = "Starting region" },
 
-                new OpLabel(10f, 355f, "Reinforced karma:") {alignment = FLabelAlignment.Left, description = "The Watcher starts their campaign with reinforced karma (karma flower effect)"},
-                new OpCheckBox(WISReinforcedKarma, 117f, 352f),
+                new OpCheckBox(WISReinforcedKarma, 5f, 352f) { description = "The Watcher starts their campaign with reinforced karma (karma flower effect)" },
+                new OpLabel(37f, 355f, "Reinforced karma") {alignment = FLabelAlignment.Left, description = "The Watcher starts their campaign with reinforced karma (karma flower effect)"},
 
-                new OpLabel(10f, 320f, "Spread rot:") {alignment = FLabelAlignment.Left, description = "The Watcher starts spreads rot to starting region (forced for Coral Caves to match game behavior)"},
-                new OpCheckBox(WISSpreadRot, 76f, 317f),
+                new OpCheckBox(WISSpreadRot, 5f, 317f) { description = "The Watcher starts spreads rot to starting region (forced for Coral Caves to match game behavior)" },
+                new OpLabel(37f, 320f, "Spread rot") {alignment = FLabelAlignment.Left, description = "The Watcher starts spreads rot to starting region (forced for Coral Caves to match game behavior)"},
+
+                new OpCheckBox(FixedSkipVoid, 5f, 282f) { description = "Skip the void sea sequence when the speedrun timer finishes in SB_L01" },
+                new OpLabel(37f, 285f, "Skip void sea") {alignment = FLabelAlignment.Left, description = "Skip the void sea sequence when the speedrun timer finishes in SB_L01"},
+
+                new OpCheckBox(CustomSaintStomach, 5f, 247f) { description = "Begin Saint's campaign with the selected item in stomach" },
+                new OpLabel(37f, 250f, "Overwrite Saint stomach item") {alignment = FLabelAlignment.Left, description = "Begin Saint's campaign with the selected item in stomach"},
+                new OpComboBox(CSSItemString, new Vector2(215f, 247f), 150f, CSSList) { description = "Item" },
             };
             mainTab.AddItems(mainTabOptions);
 
@@ -108,6 +139,8 @@ namespace RWSQOL
 
             bool WISRegionCoral = false;
 
+            bool CSSValue = false;
+
             foreach (var item in Tabs[0].items)
             {
                 if (item is OpCheckBox b)
@@ -115,6 +148,7 @@ namespace RWSQOL
                     if (b.cfgEntry == FastGameReset) fastGameResetValue = b.GetValueBool();
                     if (b.cfgEntry == FastMenuReset) fastMenuResetValue = b.GetValueBool();
                     if (b.cfgEntry == WatcherIntroSkip) WISValue = b.GetValueBool();
+                    if (b.cfgEntry == CustomSaintStomach) CSSValue = b.GetValueBool();
                 }
                 if (item is OpComboBox b2)
                 {
@@ -151,6 +185,10 @@ namespace RWSQOL
                         b2.greyedOut = true;
                     }
                     else b2.greyedOut = !WISValue;
+                }
+                if (item is OpComboBox k3 && k3.cfgEntry == CSSItemString)
+                {
+                    k3.greyedOut = !CSSValue;
                 }
             }
         }
