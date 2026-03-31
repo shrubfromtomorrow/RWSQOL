@@ -6,16 +6,30 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
 using UnityEngine;
 using Watcher;
 
 namespace RWSQOL.Modules
 {
+
     /// <summary>
     /// This class handles skipping Watcher's intro sequence with the three SpinningTop encounters and works in conjunction with the fast reset handler.
     /// </summary>
+
+    // More candid comment here since this is by far the most confusing module:
+    // While all of this could technically work just by setting warpPointTargetAfterWarpPointSave when the savestate is made, there is more that needs to be done to maintain save integrity.
+    // We also manually update certain things like ripple and traversed regions. However, rotting the region without manually faking a regionstate in the savestate (miserable, don't try) is hard.
+    // To do this, we wait until the region is through NewWorldLoaded_Room. Typically the game rots regions before going to the sleep screen and saving, but we must do it now.
+    // So, pending rot is set, then orig is called literally just to rot the region and do the normal game stuff.
+    // However, if we are to die now, none of this is saved to disk, so we must do a save as well. However, by this time, the game has set warpPointTargetAfterWarpPointSave to null.
+    // So, we must again set warpPointTargetAfterWarpPointSave, then save everything to file (both the rot state and warpPointTargetAfterWarpPointSave).
+    // After this, if the player were to die, warpPointTargetAfterWarpPointSave is set to not null in memory so the player is unnaturally brought to the ripple ladder screen to lose karma.
+    // To fix this, warpPointTargetAfterWarpPointSave is set to null in memory. After this point, the save state should be as the game naturally expects, barring stuff with HI.
+
     public class WatcherIntroSkip
     {
         public static bool Toggled => Plugin.Instance.options.WatcherIntroSkip.Value;
@@ -32,23 +46,11 @@ namespace RWSQOL.Modules
             { "Coral Caves", "SpinningTopSpot><591.3841><1316.087><37~40~Watcher~WRFA~wrfa_sk04~550~450~16"},
             { "Torrential Railways", "SpinningTopSpot><647.808><357.6914><44~106~Watcher~WSKA~wska_d27~470~410~17"}
         };
+
         public static void Apply()
         {
             On.StoryGameSession.ctor += StoryGameSession_ctor;
             On.Watcher.WarpPoint.NewWorldLoaded_Room += WarpPoint_NewWorldLoaded_Room;
-        }
-
-        /// <summary>
-        /// Typically room rotting is done as the cycle ends (newworldloaded is called then as well) and then pending is set to false when the new story session is made.
-        /// This tidies up the pending that is set to true when the story session is made so rotting is limited to the first region.
-        /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        /// <param name="newRoom"></param>
-        private static void WarpPoint_NewWorldLoaded_Room(On.Watcher.WarpPoint.orig_NewWorldLoaded_Room orig, WarpPoint self, Room newRoom)
-        {
-            orig(self, newRoom);
-            newRoom.world.game.GetStorySession.pendingSentientRotInfectionFromWarp = false;
         }
 
         /// <summary>
@@ -68,17 +70,12 @@ namespace RWSQOL.Modules
 
             if (self.game.manager.menuSetup.startGameCondition == ProcessManager.MenuSetup.StoryGameInitCondition.New)
             {
-                string[] POString = Regex.Split(regionToPO[EntryRegion], "><");
-                string denRoom = Regex.Split(POString[3], "~")[4].ToUpperInvariant(); // this makes me timbers shiver
 
-                PlacedObject po = new PlacedObject(PlacedObject.Type.None, null);
-                po.FromString(POString);
-
-                WarpPoint.WarpPointData wpData = CreateSpecialWarpData(po.data as SpinningTopData);
+                WarpPoint.WarpPointData wpData = CreateSpecialWarpData();
 
                 // The meat
                 self.saveState.warpPointTargetAfterWarpPointSave = wpData;
-                self.saveState.denPosition = denRoom;
+                self.saveState.denPosition = wpData.destRoom.ToUpperInvariant();
 
                 // The vegetables
                 self.saveState.deathPersistentSaveData.minimumRippleLevel = 1f;
@@ -90,19 +87,51 @@ namespace RWSQOL.Modules
                 self.saveState.miscWorldSaveData.hasSkippedFirstWarpFatigueTransfer = 1;
 
                 self.saveState.deathPersistentSaveData.reinforcedKarma = KarmaReinforced;
-
-                self.pendingSentientRotInfectionFromWarp = SpreadRot;
-                game.rainWorld.progression.SaveWorldStateAndProgression(false);
             }
         }
 
         /// <summary>
-        /// Helper method that is a clone of SpinningTopData.CreateWarpPointData but does not require Room as a parameter. For the purposes of fudging PO data.
+        /// Spread rot to the region as it is loaded, save said rot spread afterwards. Also set the warp point target so that when data is saved null isn't saved to disk. Save null to memory.
         /// </summary>
-        /// <param name="stData"></param>
-        /// <returns></returns>
-        private static WarpPoint.WarpPointData CreateSpecialWarpData(SpinningTopData stData)
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        /// <param name="newRoom"></param>
+        private static void WarpPoint_NewWorldLoaded_Room(On.Watcher.WarpPoint.orig_NewWorldLoaded_Room orig, WarpPoint self, Room newRoom)
         {
+
+            if (!ModManager.Watcher || newRoom.game.GetStorySession.saveStateNumber != WatcherEnums.SlugcatStatsName.Watcher || !Toggled)
+            {
+                orig(self, newRoom);
+            }
+            else
+            {
+                if (newRoom.game.manager.menuSetup.startGameCondition == ProcessManager.MenuSetup.StoryGameInitCondition.New)
+                {
+                    newRoom.world.game.GetStorySession.pendingSentientRotInfectionFromWarp = SpreadRot;
+                    orig(self, newRoom);
+                    newRoom.world.game.GetStorySession.saveState.warpPointTargetAfterWarpPointSave = CreateSpecialWarpData();
+                    newRoom.world.game.rainWorld.progression.SaveWorldStateAndProgression(false);
+                    newRoom.world.game.GetStorySession.saveState.warpPointTargetAfterWarpPointSave = null; // gotta keep this null in memory in case the player dies (ripplmode karma ladder screen)
+                }
+                else
+                {
+                    orig(self, newRoom);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Helper method that is a clone of SpinningTopData.CreateWarpPointData (that also creates initial STData) but does not require Room as a parameter. For the purposes of fudging PO data.
+        /// </summary>
+        /// <returns>Returns fudged warp data</returns>
+        private static WarpPoint.WarpPointData CreateSpecialWarpData()
+        {
+            string[] POString = Regex.Split(regionToPO[EntryRegion], "><");
+
+            PlacedObject po = new PlacedObject(PlacedObject.Type.None, null);
+            po.FromString(POString);
+            SpinningTopData stData = po.data as SpinningTopData;
+
             WarpPoint.WarpPointData warpPointData = new WarpPoint.WarpPointData(null);
             warpPointData.destPos = stData.destPos;
             warpPointData.RegionString = stData.RegionString;

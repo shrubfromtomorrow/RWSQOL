@@ -20,7 +20,39 @@ namespace RWSQOL.Modules
         public static void Apply()
         {
             IL.MoreSlugcats.MSCRoomSpecificScript.SI_SAINTINTRO_tut.Update += SI_SAINTINTRO_tut_Update;
+            //On.AbstractPhysicalObject.ctor += AbstractPhysicalObject_ctor;
+            //On.AbstractCreature.ctor += AbstractCreature_ctor;
         }
+
+        // Helpers to find creature and item strings for the config menu
+        private static void AbstractCreature_ctor(On.AbstractCreature.orig_ctor orig, AbstractCreature self, World world, CreatureTemplate creatureTemplate, Creature realizedCreature, WorldCoordinate pos, EntityID ID)
+        {
+            orig(self,world,creatureTemplate,realizedCreature,pos,ID);
+            if (self == null) return;
+            try
+            {
+                Plugin.Logger.LogInfo(SaveState.AbstractCreatureToStringStoryWorld(self));
+            }
+            catch
+            {
+                return;
+            }
+        }
+        private static void AbstractPhysicalObject_ctor(On.AbstractPhysicalObject.orig_ctor orig, AbstractPhysicalObject self, World world, AbstractPhysicalObject.AbstractObjectType type, PhysicalObject realizedObject, WorldCoordinate pos, EntityID ID)
+        {
+            orig(self, world, type, realizedObject, pos, ID);
+            if (self == null) return;
+            try
+            {
+                Plugin.Logger.LogInfo(self.ToString());
+            }
+            catch
+            {
+                return;
+            }
+        }
+
+        
 
         /// <summary>
         /// Patch in to where the rolloverobject is being used and return the remix value, with a new ID given by the game.

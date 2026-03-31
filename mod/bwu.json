@@ -2,7 +2,7 @@
   "WorkshopID": 3693000839,
   "LatestGameVersion": "v1.11.6",
   "UpdateTitle": true,
-  "UpdateDescription": true,
+  "UpdateDescription": false,
   "MarkAsPublic": false,
   "Tags": [
     "Game Mechanics",

@@ -76,9 +76,9 @@ namespace RWSQOL.Modules
 
                 c.Emit(OpCodes.Pop);
 
-                c.EmitDelegate<Func<bool>>(() =>
+                c.EmitDelegate<Func<bool>>(() => // delegate to be more modular later
                 {
-                    return FastGameReset || FastMenuReset;
+                    return true;
                 });
 
                 c.MarkLabel(skipDelegate);

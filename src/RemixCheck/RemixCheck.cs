@@ -120,10 +120,12 @@ namespace RWSQOL.RemixCheck
                 OpLabel modsTitle = new OpLabel(new Vector2(10f, yAnchor), new Vector2(300f, 30f), "Mods", FLabelAlignment.Left, true);
                 modsLabels.Add(modsTitle);
 
-                if (illegalMods.Where(x => x.id != ModIDs.MSC && x.id != ModIDs.Watcher).Any())
+                List<ModManager.Mod> illegalModsSansConditionals = illegalMods.Where(x => x.id != ModIDs.MSC && x.id != ModIDs.Watcher).ToList();
+
+                if (illegalModsSansConditionals.Count > 0)
                 {
                     OpHoldButton fixModsButton = new OpHoldButton(new Vector2(70f, yAnchor), new Vector2(60f, 25f), "FIX", 40f);
-                    fixModsButton.OnPressDone += trigger => Fix.FixMods(illegalMods);
+                    fixModsButton.OnPressDone += trigger => Fix.FixMods(illegalModsSansConditionals);
                     modsLabels.Add(fixModsButton);
                 }
             }

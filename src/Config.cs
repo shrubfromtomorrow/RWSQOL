@@ -64,16 +64,17 @@ namespace RWSQOL
                 new ListItem("{ID}<oB>0<oA>BubbleGrass<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>1", "BubbleGrass", 1),
                 new ListItem("{ID}<oB>0<oA>DataPearl<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>", "DataPearl", 2),
                 new ListItem("{ID}<oB>0<oA>FirecrackerPlant<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "FirecrackerPlant", 3),
-                new ListItem("{ID}<oB>0<oA>FlareBomb<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "FlareBomb", 4),
-                new ListItem("{ID}<oB>0<oA>FlyLure<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "FlyLure", 5),
-                new ListItem("{ID}<cB>0<cA>SI_SAINTINTRO.-1<cA>", "Hazer", 6),
-                new ListItem("ID.-1.6984<oB>0<oA>Lantern<oA>SI_SAINTINTRO.18.5.-1", "Lantern", 0),
-                new ListItem("{ID}<oB>0<oA>PuffBall<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "PuffBall", 7),
-                new ListItem("{ID}<oB>0<oA>Rock<oA>SI_SAINTINTRO.18.5.-1", "Rock", 8),
-                new ListItem("{ID}<oB>0<oA>ScavengerBomb<oA>SI_SAINTINTRO.18.5.-1", "ScavengerBomb", 9),
-                new ListItem("{ID}<oB>0<oA>SporePlant<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>0<oA>0", "SporePlant", 10),
-                new ListItem("VultureGrub<cA>{ID}<cB>0<cA>SI_SAINTINTRO.-1<cA>", "VultureGrub", 11),
-                new ListItem("{ID}<oB>0<oA>WaterNut<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>0", "WaterNut", 12),
+                new ListItem("{ID}<oB>0<oA>FireEgg<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "FireEgg", 4),
+                new ListItem("{ID}<oB>0<oA>FlareBomb<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "FlareBomb", 5),
+                new ListItem("{ID}<oB>0<oA>FlyLure<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "FlyLure", 6),
+                new ListItem("Hazer<cA>{ID}<cB>0<cA>SI_SAINTINTRO.-1<cA>", "Hazer", 7),
+                new ListItem("{ID}<oB>0<oA>Lantern<oA>SI_SAINTINTRO.18.5.-1", "Lantern", 0),
+                new ListItem("{ID}<oB>0<oA>PuffBall<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0", "PuffBall", 8),
+                new ListItem("{ID}<oB>0<oA>Rock<oA>SI_SAINTINTRO.18.5.-1", "Rock", 9),
+                new ListItem("{ID}<oB>0<oA>ScavengerBomb<oA>SI_SAINTINTRO.18.5.-1", "ScavengerBomb", 10),
+                new ListItem("{ID}<oB>0<oA>SporePlant<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>0<oA>0", "SporePlant", 11),
+                new ListItem("VultureGrub<cA>{ID}<cB>0<cA>SI_SAINTINTRO.-1<cA>", "VultureGrub", 12),
+                new ListItem("{ID}<oB>0<oA>WaterNut<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>0", "WaterNut", 13),
             };
 
             mainTab = new OpTab(this, "Main");
@@ -95,7 +96,7 @@ namespace RWSQOL
 
                 new OpCheckBox(FastMenuReset, 5f, 527f) { description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable" },
                 new OpLabel(37f, 530f, "Fast save restart (menu)") {alignment = FLabelAlignment.Left, description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable"},
-                new OpKeyBinder(FastResetKey, new Vector2(181f, 506f), new Vector2(110f, 20f), false) { description = "Keybind for game/menu fast restart" },
+                new OpKeyBinder(FastResetKey, new Vector2(181f, 506f), new Vector2(120f, 20f), true, OpKeyBinder.BindController.AnyController) { description = "Keybind for game/menu fast restart" },
 
                 new OpCheckBox(FastGameReset, 5f, 492f) { description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable" },
                 new OpLabel(37f, 495f, "Fast save restart (game)") {alignment = FLabelAlignment.Left, description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable"},
