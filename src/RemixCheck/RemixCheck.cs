@@ -34,9 +34,9 @@ namespace RWSQOL.RemixCheck
             OpLabel title = new OpLabel(new Vector2(150f, 575f), new Vector2(300f, 30f), "Remix Checker", FLabelAlignment.Center, true);
             title.label.shader = Custom.rainWorld.Shaders["MenuText"];
 
-            OpImage headerLine = new OpImage(new Vector2(0f, 564f), "pixel")
+            OpImage separator = new OpImage(new Vector2(0f, 564f), "pixel")
             {
-                scale = new Vector2(600f, 1f),
+                scale = new Vector2(600f, 2f),
                 color = MenuColorEffect.rgbMediumGrey
             };
 
@@ -49,7 +49,7 @@ namespace RWSQOL.RemixCheck
             UIelement[] elements = new UIelement[]
             {
                 title,
-                headerLine
+                separator
             }
             .Concat(settingLabels)
             .Concat(modsLabels)

@@ -12,6 +12,7 @@ namespace RWSQOL
     public class Config : OptionInterface
     {
         private OpTab mainTab;
+        private OpTab speedrunTimerTab;
         private OpTab remixCheckTab;
 
         public readonly Configurable<bool> FastMenuReset;
@@ -29,8 +30,25 @@ namespace RWSQOL
         public readonly Configurable<string> CSSItemString;
         public List<ListItem> CSSList;
 
+        public readonly Configurable<bool> PreventTimerFading;
+        public readonly Configurable<bool> ShowCompletedAndLost;
+        public readonly Configurable<bool> ShowOldTimer;
+        public readonly Configurable<bool> ShowTimerInSleepScreen;
+        public readonly Configurable<bool> ShowTotTime;
+        public readonly Configurable<string> TimerPosition;
+        public static readonly string[] TimerPositions =
+        [
+            "Top (Default)",
+            "Top Left",
+            "Top Right",
+            "Bottom Left",
+            "Bottom Right",
+            "Bottom"
+        ];
+        public readonly Configurable<Color> TimerColor;
 
         private UIelement[] mainTabOptions;
+        private UIelement[] speedrunTabOptions;
 
         public Config()
         {
@@ -46,6 +64,14 @@ namespace RWSQOL
             FixedSkipVoid = config.Bind<bool>("FixedSkipVoid", false);
             CustomSaintStomach = config.Bind<bool>("CustomSaintStomach", false);
             CSSItemString = config.Bind<string>("CSSItemString", "Lantern");
+
+            PreventTimerFading = config.Bind("PreventTimerFading", false);
+            ShowCompletedAndLost = config.Bind("ShowCompletedAndLost", false);
+            ShowOldTimer = config.Bind("ShowOldTimer", false);
+            ShowTimerInSleepScreen = config.Bind("ShowTimerInSleepScreen", false);
+            ShowTotTime = config.Bind("ShowTotTime", false);
+            TimerPosition = config.Bind("TimerPosition", TimerPositions[0]);
+            TimerColor = config.Bind("TimerColor", Color.white);
         }
 
         public override void Initialize()
@@ -78,43 +104,48 @@ namespace RWSQOL
             };
 
             mainTab = new OpTab(this, "Main");
+            speedrunTimerTab = new OpTab(this, "Timer Tweaks");
             remixCheckTab = new OpTab(this, "Remix Check");
             RemixCheck.RemixCheck.remixTab = remixCheckTab;
             remixCheckTab.OnPostActivate += () => RemixCheck.RemixCheck.Populate();
 
-            Tabs = new[] { mainTab, remixCheckTab };
+            Tabs = new[] { mainTab, speedrunTimerTab, remixCheckTab };
 
-            OpImage separator = new OpImage(new Vector2(0f, 564f), "pixel") { scale = new Vector2(600f, 1f), color = MenuColorEffect.rgbMediumGrey };
 
             var mainTitle = new OpLabel(new Vector2(150f, 575f), new Vector2(300f, 30f), "Speedrunning QOL", FLabelAlignment.Center, true);
             mainTitle.label.shader = Custom.rainWorld.Shaders["MenuText"];
+            OpImage mainSeparator = new OpImage(new Vector2(0f, 564f), "pixel") { scale = new Vector2(600f, 2f), color = MenuColorEffect.rgbMediumGrey };
+
+            var timerTitle = new OpLabel(new Vector2(150f, 575f), new Vector2(300f, 30f), "Speedrun Timer Tweaks", FLabelAlignment.Center, true);
+            timerTitle.label.shader = Custom.rainWorld.Shaders["MenuText"];
+            OpImage timerSeparator = new OpImage(new Vector2(0f, 564f), "pixel") { scale = new Vector2(600f, 2f), color = MenuColorEffect.rgbMediumGrey };
 
             mainTabOptions = new UIelement[]
             {
                 mainTitle,
-                separator,
+                mainSeparator,
 
                 new OpCheckBox(FastMenuReset, 5f, 527f) { description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable" },
                 new OpLabel(37f, 530f, "Fast save restart (menu)") {alignment = FLabelAlignment.Left, description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable"},
                 new OpKeyBinder(FastResetKey, new Vector2(181f, 506f), new Vector2(120f, 20f), true, OpKeyBinder.BindController.AnyController) { description = "Keybind for game/menu fast restart" },
 
-                new OpCheckBox(FastGameReset, 5f, 492f) { description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable" },
+                new OpCheckBox(FastGameReset, 5f, 492f) { description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable"},
                 new OpLabel(37f, 495f, "Fast save restart (game)") {alignment = FLabelAlignment.Left, description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable"},
 
-                new OpCheckBox(SaintDetPopcorn, 5f, 457f) { description = "Make Saint tutorial popcorn always pop 5 seconds after entering SI_C02 for the first time, as though optimal RNG" },
+                new OpCheckBox(SaintDetPopcorn, 5f, 457f) { description = "Make Saint tutorial popcorn always pop 5 seconds after entering SI_C02 for the first time, as though optimal RNG"},
                 new OpLabel(37f, 460f, "Consistent Saint tutorial popcorn") {alignment = FLabelAlignment.Left, description = "Make Saint tutorial popcorn always pop 5 seconds after entering SI_C02 for the first time, as though optimal RNG"},
 
-                new OpCheckBox(MoonUncloak, 5f, 422f) { description = "Moon's cloak will always exist in MS_FARSIDE for slugcats that can obtain it when restarting a save. Actions taken in other campaigns have no effect in a given campaign" },
+                new OpCheckBox(MoonUncloak, 5f, 422f) { description = "Moon's cloak will always exist in MS_FARSIDE for slugcats that can obtain it when restarting a save. Actions taken in other campaigns have no effect in a given campaign"},
                 new OpLabel(37f, 425f, "Moon cloak campaign independence") {alignment = FLabelAlignment.Left, description = "Moon's cloak will always exist in MS_FARSIDE for slugcats that can obtain it when restarting a save. Actions taken in other campaigns have no effect in a given campaign"},
 
-                new OpCheckBox(WatcherIntroSkip, 5f, 387f) { description = "Beginning Watcher's campaign will start Watcher in the selected starting region with the selected options" },
+                new OpCheckBox(WatcherIntroSkip, 5f, 387f) { description = "Beginning Watcher's campaign will start Watcher in the selected starting region with the selected options"},
                 new OpLabel(37f, 390f, "Watcher Intro Skip") {alignment = FLabelAlignment.Left, description = "Beginning Watcher's campaign will start Watcher in the selected starting region with the selected options"},
-                new OpComboBox(WISRegionString, new Vector2(153f, 387f), 150f, WISRegionList) { description = "Starting region" },
+                new OpComboBox(WISRegionString, new Vector2(153f, 387f), 150f, WISRegionList) { description = "Starting region"},
 
                 new OpCheckBox(WISReinforcedKarma, 5f, 352f) { description = "The Watcher starts their campaign with reinforced karma (karma flower effect)" },
                 new OpLabel(37f, 355f, "Reinforced karma") {alignment = FLabelAlignment.Left, description = "The Watcher starts their campaign with reinforced karma (karma flower effect)"},
 
-                new OpCheckBox(WISSpreadRot, 5f, 317f) { description = "The Watcher starts spreads rot to starting region (forced for Coral Caves to match game behavior)" },
+                new OpCheckBox(WISSpreadRot, 5f, 317f) { description = "The Watcher starts spreads rot to starting region (forced for Coral Caves to match game behavior)"},
                 new OpLabel(37f, 320f, "Spread rot") {alignment = FLabelAlignment.Left, description = "The Watcher starts spreads rot to starting region (forced for Coral Caves to match game behavior)"},
 
                 new OpCheckBox(FixedSkipVoid, 5f, 282f) { description = "Skip the void sea sequence when the speedrun timer finishes in SB_L01" },
@@ -126,7 +157,33 @@ namespace RWSQOL
             };
             mainTab.AddItems(mainTabOptions);
 
-            //RemixCheck.RemixCheck.Populate();
+            speedrunTabOptions = new UIelement[]
+            {
+                timerTitle,
+                timerSeparator,
+
+                new OpCheckBox(PreventTimerFading, 5f, 527f) { description = "Prevent IGT from fading out, making it more visible all the time" },
+                new OpLabel(37f, 530f, "Prevent Timer Fading") {alignment = FLabelAlignment.Left, description = "Prevent IGT from fading out, making it more visible all the time"},
+
+                new OpCheckBox(ShowCompletedAndLost, 5f, 492f) { description = "Show complete time (cycles where player survived) and lost time (cycles where player died) on the select menu"},
+                new OpLabel(37f, 495f, "Show Completed & Lost Time") {alignment = FLabelAlignment.Left, description = "Show complete time (cycles where player survived) and lost time (cycles where player died) on the select menu"},
+
+                new OpCheckBox(ShowOldTimer, 5f, 457f) { description = "Display the old IGT below/beside the current one in game/on the select screen"},
+                new OpLabel(37f, 460f, "Show Legacy Timer") {alignment = FLabelAlignment.Left, description = "Display the old IGT below/beside the current one in game/on the select screen"},
+
+                new OpCheckBox(ShowTimerInSleepScreen, 5f, 422f) { description = "Display the speedrun timer in the sleep screen" },
+                new OpLabel(37f, 425f, "Show Timer in Sleep Screen?") {alignment = FLabelAlignment.Left, description = "Display the speedrun timer in the sleep screen"},
+
+                new OpCheckBox(ShowTotTime, 5f, 387f) { description = "Show totTime (relevant for several calculations) below/beside the timer in game/on the select screen"},
+                new OpLabel(37f, 390f, "Show totTime") {alignment = FLabelAlignment.Left, description = "Show totTime (relevant for several calculations) below/beside the timer in game/on the select screen"},
+
+                new OpLabel(5f, 355f, "Timer Position") {alignment = FLabelAlignment.Left, description = "Change speedrun timer position between several presets"},
+                new OpComboBox(TimerPosition, new Vector2(94f, 352f), 150f, TimerPositions) { description = "Change speedrun timer position between several presets"},
+
+                new OpLabel(365f, 528f, "Timer Color") {alignment = FLabelAlignment.Left, description = "Set a custom speedrun timer color"},
+                new OpColorPicker(TimerColor, new Vector2(440f, 395f)) { description = "Set a custom speedrun timer color"},
+            };
+            speedrunTimerTab.AddItems(speedrunTabOptions);
         } 
 
         public override void Update()
