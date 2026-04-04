@@ -139,14 +139,14 @@ namespace RWSQOL
                 new OpLabel(37f, 425f, "Moon cloak campaign independence") {alignment = FLabelAlignment.Left, description = "Moon's cloak will always exist in MS_FARSIDE for slugcats that can obtain it when restarting a save. Actions taken in other campaigns have no effect in a given campaign"},
 
                 new OpCheckBox(WatcherIntroSkip, 5f, 387f) { description = "Beginning Watcher's campaign will start Watcher in the selected starting region with the selected options"},
-                new OpLabel(37f, 390f, "Watcher Intro Skip") {alignment = FLabelAlignment.Left, description = "Beginning Watcher's campaign will start Watcher in the selected starting region with the selected options"},
-                new OpComboBox(WISRegionString, new Vector2(153f, 387f), 150f, WISRegionList) { description = "Starting region"},
+                new OpLabel(37f, 390f, "Watcher Intro Skip") {alignment = FLabelAlignment.Left, description = "Beginning Watcher's campaign will start Watcher in the selected starting region with the selected options", color = RainWorld.RippleColor},
+                new OpComboBox(WISRegionString, new Vector2(153f, 387f), 150f, WISRegionList) { description = "Starting region", colorEdge = RainWorld.RippleColor},
 
-                new OpCheckBox(WISReinforcedKarma, 5f, 352f) { description = "The Watcher starts their campaign with reinforced karma (karma flower effect)" },
-                new OpLabel(37f, 355f, "Reinforced karma") {alignment = FLabelAlignment.Left, description = "The Watcher starts their campaign with reinforced karma (karma flower effect)"},
+                new OpCheckBox(WISReinforcedKarma, 5f, 352f) { description = "The Watcher starts their campaign with reinforced karma (karma flower effect)"},
+                new OpLabel(37f, 355f, "Reinforced karma") {alignment = FLabelAlignment.Left, description = "The Watcher starts their campaign with reinforced karma (karma flower effect)", color = RainWorld.RippleColor},
 
                 new OpCheckBox(WISSpreadRot, 5f, 317f) { description = "The Watcher starts spreads rot to starting region (forced for Coral Caves to match game behavior)"},
-                new OpLabel(37f, 320f, "Spread rot") {alignment = FLabelAlignment.Left, description = "The Watcher starts spreads rot to starting region (forced for Coral Caves to match game behavior)"},
+                new OpLabel(37f, 320f, "Spread rot") {alignment = FLabelAlignment.Left, description = "The Watcher starts spreads rot to starting region (forced for Coral Caves to match game behavior)", color = RainWorld.RippleColor},
 
                 new OpCheckBox(FixedSkipVoid, 5f, 282f) { description = "Skip the void sea sequence when the speedrun timer finishes in SB_L01" },
                 new OpLabel(37f, 285f, "Skip void sea") {alignment = FLabelAlignment.Left, description = "Skip the void sea sequence when the speedrun timer finishes in SB_L01"},

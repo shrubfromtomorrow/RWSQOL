@@ -126,6 +126,7 @@ namespace RWSQOL.RemixCheck
                 if (illegalModsSansConditionals.Count > 0)
                 {
                     OpHoldButton fixModsButton = new OpHoldButton(new Vector2(70f, yAnchor), new Vector2(60f, 25f), "FIX", 40f);
+                    fixModsButton.colorEdge = new Color(0.85f, 0.35f, 0.4f);
                     fixModsButton.description = "Disable all illegal mods highlighted in red, enable required mods also highlighted in red. AUTOMATICALLY APPLIES (may restart game)";
                     fixModsButton.OnPressDone += trigger => Fix.FixMods(illegalModsSansConditionals);
                     modsLabels.Add(fixModsButton);

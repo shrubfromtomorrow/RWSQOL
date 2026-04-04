@@ -41,6 +41,12 @@ namespace RWSQOL.RemixCheck
             };
 
             OptionInterface oi = MachineConnector.GetRegisteredOI(mod.id);
+            if (oi == null)
+            {
+                Plugin.Logger.LogError("No registered OI for: " + mod.id);
+                result.IsValid = false;
+                return result;
+            }
             Dictionary<string, ConfigurableBase> config = oi.config.configurables;
             
 

@@ -14,12 +14,13 @@ namespace RWSQOL.Modules
         public static void Apply()
         {
             FastResetHandler.Apply();
-            SaintPopcornTut.Apply();
-            MoonUncloak.Apply();
-            WatcherIntroSkip.Apply();
             FixedSkipVoid.Apply();
+            ForceValidation.Apply();
+            MoonUncloak.Apply();
+            SaintPopcornTut.Apply();
             SaintStomachSetup.Apply();
             SpeedrunTimerTweaks.Apply();
+            WatcherIntroSkip.Apply();
         }
     }
 }

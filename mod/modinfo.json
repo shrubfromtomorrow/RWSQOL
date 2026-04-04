@@ -1,9 +1,9 @@
 ﻿{
   "id": "shrub.rwsqol",
   "name": "Speedrunning QOL",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "authors": "shrubfromtomorrow",
-  "description": "A collection of quality of life changes targeted at improving the speedrunning experience.\nLegal for all speedrun.com runs.\nCredit to forthfora for their Speedrun Timer Tweaks code.\nThumbnail by sigma",
+  "description": "A collection of quality of life changes targeted at improving the speedrunning experience.\nLegal for all speedrun.com runs.",
   "tags": [
     "Game Mechanics",
     "Tools",

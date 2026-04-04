@@ -29,13 +29,13 @@ namespace RWSQOL.RemixCheck
         public const string ModPresets = "Isbjorn52.ModPresets";
         public const string NoMoreFullscreenBlur = "nomoreblur";
         public const string MenuFixes = "MenuFixes";
-        public const string OptimizedRemix = "zombieseatflesh7.OptimizedRemix";
+        public const string OptimizedRemix = "OptimizedRemix";
         public const string RemixAutoRestart = "Gamer025.RemixAutoRestart";
         public const string NoModUpdateConfirm = "kevadroz.no_mod_update_confirm";
         public const string ExactRequirements = "magica.exactrequirements";
         public const string WorkshopButton = "fargegoty.workshopbutton";
         public const string ModInExplorerButton = "darkninja.ModInExplorerButton";
-        public const string ScrollFix = "zombieseatflesh7.ScrollFix";
+        public const string ScrollFix = "ScrollFix";
         public const string ModlistHotload = "fargegoty.ModlistHotload";
         public const string SixtyFPSMenus = "SixtyFPSMenus";
         public const string YeekMaulingFix = "randi_moth.yeek_golf";
