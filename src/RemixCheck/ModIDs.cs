@@ -39,5 +39,6 @@ namespace RWSQOL.RemixCheck
         public const string ModlistHotload = "fargegoty.ModlistHotload";
         public const string SixtyFPSMenus = "SixtyFPSMenus";
         public const string YeekMaulingFix = "randi_moth.yeek_golf";
+        public const string WatcherIntroSkip = "shrubfromtomorrow.watcherIntroSkip";
     }
 }

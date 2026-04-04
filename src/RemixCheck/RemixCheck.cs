@@ -241,7 +241,8 @@ namespace RWSQOL.RemixCheck
             ModIDs.ScrollFix,
             ModIDs.ModlistHotload,
             ModIDs.SixtyFPSMenus,
-            ModIDs.YeekMaulingFix
+            ModIDs.YeekMaulingFix,
+            ModIDs.WatcherIntroSkip
         };
     }
 
