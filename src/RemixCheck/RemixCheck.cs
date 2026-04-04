@@ -74,6 +74,7 @@ namespace RWSQOL.RemixCheck
                 if (invalidSettings.Where(x => !x.IsConditional).Any())
                 {
                     OpHoldButton fixSettingsButton = new OpHoldButton(new Vector2(95f, 525f), new Vector2(60f, 25f), "FIX", 40f);
+                    fixSettingsButton.description = "Fix all illegal settings in red, enable all required settings also in red";
                     fixSettingsButton.OnPressDone += Fix.FixSettings;
                     settingsLabels.Add(fixSettingsButton);
                 }
@@ -125,6 +126,7 @@ namespace RWSQOL.RemixCheck
                 if (illegalModsSansConditionals.Count > 0)
                 {
                     OpHoldButton fixModsButton = new OpHoldButton(new Vector2(70f, yAnchor), new Vector2(60f, 25f), "FIX", 40f);
+                    fixModsButton.description = "Disable all illegal mods highlighted in red, enable required mods also highlighted in red. AUTOMATICALLY APPLIES (may restart game)";
                     fixModsButton.OnPressDone += trigger => Fix.FixMods(illegalModsSansConditionals);
                     modsLabels.Add(fixModsButton);
                 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using RWCustom;
+using Menu;
 using static RWSQOL.Enums.Enums;
 using UnityEngine;
 using HUD;
@@ -25,6 +26,8 @@ namespace RWSQOL.Modules
         private const float HOLDDURATION = 1.5f; // 1.5 seconds hold time
         private static float heldTime;
         private static float lastHeldTime;
+
+        private static RWCustom.Counter fromGameDelayCounter = new Counter(10, 0, true);
 
         private static FastResetPhase phase = FastResetPhase.Idle;
         public static void TriggerReset()
@@ -92,24 +95,47 @@ namespace RWSQOL.Modules
         /// <summary>
         /// Automatically checks the restart checkbox and fills start game circle for campaign. Also sets a specific bool to allow for autosplitter compatability.
         /// Triggers only if the FastResetHandler is in a waiting for next tick (reset pressed in menu) or waiting for menu to exist (reset pressed from in-game) phase.
+        /// Is also constrained by a 3 tick delay window to allow time for the autosplitter to write the hasSignalled from the new menu to memory. This is actually set to 10 for better visuals.
         /// </summary>
         /// <param name="orig"></param>
         /// <param name="self"></param>
         private static void SlugcatSelectMenu_Update(On.Menu.SlugcatSelectMenu.orig_Update orig, Menu.SlugcatSelectMenu self)
         {
             orig(self);
-            // This should run from the menu directly only if the option is enabled. Can still run if game reset only is enabled.
-            if ((phase == FastResetPhase.WaitingNextTick && FastMenuReset) || phase == FastResetPhase.WaitingMenu)
+
+            if (phase == FastResetPhase.WaitingNextTick && FastMenuReset)
             {
-                Plugin.Logger.LogInfo("In menu, phase is: " + phase.ToString());
-                if (self.manager?.upcomingProcess == null)
-                {
-                    self.restartCheckbox.Checked = true;
-                    self.startButton.hasSignalled = true; // For autosplitter
-                    self.Singal(null, "START");
-                }
-                phase = FastResetPhase.Idle;
+                StartGame(self);
+                return;
             }
+
+            if (phase == FastResetPhase.WaitingMenu)
+            {
+                if (!fromGameDelayCounter.isFinished)
+                {
+                    fromGameDelayCounter.Tick();
+                    return;
+                }
+
+                StartGame(self);
+                fromGameDelayCounter.Reset();
+            }
+        }
+
+        /// <summary>
+        /// Helper method to separate starting logic from phase control flow.
+        /// </summary>
+        /// <param name="self"></param>
+        private static void StartGame(Menu.SlugcatSelectMenu self)
+        {
+            if (self.manager?.upcomingProcess != null) return;
+
+            self.restartCheckbox.Checked = true;
+            self.startButton.filled = 1f;
+            self.startButton.hasSignalled = true; // for autosplitter
+            self.Singal(null, "START");
+
+            phase = FastResetPhase.Idle;
         }
 
         /// <summary>
@@ -122,6 +148,7 @@ namespace RWSQOL.Modules
         {
             orig(self, manager);
             if (phase != FastResetPhase.WaitingMenu) phase = FastResetPhase.Idle;
+            //else phase = FastResetPhase.WaitingNextTick;
         }
 
         /// <summary>
@@ -185,7 +212,7 @@ namespace RWSQOL.Modules
                 if (self.manager?.upcomingProcess != null) return;
 
                 self.ExitGame(true, true);
-                self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.SlugcatSelect);
+                self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.SlugcatSelect, 0f);
                 phase = FastResetPhase.WaitingMenu;
             }
             if (phase != FastResetPhase.HoldBegun && heldTime > 0f)
@@ -228,7 +255,7 @@ namespace RWSQOL.Modules
             public ResetMeter(HUD.HUD hud) : base(hud)
             {
 
-                this.pos = new Vector2((float)((int)((this.hud.rainWorld.options.ScreenSize.x / 2f) - (SEPARATIONDIST / 2f))) + 5.5f, (float)((int)(this.hud.rainWorld.options.ScreenSize.y - (12f)) + 0.2f));
+                this.pos = new Vector2((float)((int)((this.hud.rainWorld.options.ScreenSize.x / 2f) - (SEPARATIONDIST / 2f))) + 6.5f, (float)((int)(this.hud.rainWorld.options.ScreenSize.y - (12f)) + 0.2f));
                 this.lastPos = this.pos;
 
                 this.line = new FSprite("pixel", true);

@@ -25,7 +25,7 @@ namespace RWSQOL.RemixCheck
         public const string NoTinnitus = "slime-cubed.notinnitus";
         public const string SpeedrunTimerFix = "speedruntimerfix";
         public const string MusicAnnouncements = "sabreml.musicannouncements";
-        public const string MergeFix = "bro.fixedmerging";
+        public const string MergeFix = "bro.mergefix";
         public const string ModPresets = "Isbjorn52.ModPresets";
         public const string NoMoreFullscreenBlur = "nomoreblur";
         public const string MenuFixes = "MenuFixes";

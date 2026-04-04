@@ -126,11 +126,11 @@ namespace RWSQOL
                 mainSeparator,
 
                 new OpCheckBox(FastMenuReset, 5f, 527f) { description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable" },
-                new OpLabel(37f, 530f, "Fast save restart (menu)") {alignment = FLabelAlignment.Left, description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable"},
+                new OpLabel(37f, 530f, "Fast save restart (menu)") {alignment = FLabelAlignment.Left, description = "Press keybind to instantly restart a campaign and skip cutscenes if applicable. Illegal for the All Unlocks Vanilla speedrun"},
                 new OpKeyBinder(FastResetKey, new Vector2(181f, 506f), new Vector2(120f, 20f), true, OpKeyBinder.BindController.AnyController) { description = "Keybind for game/menu fast restart" },
 
                 new OpCheckBox(FastGameReset, 5f, 492f) { description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable"},
-                new OpLabel(37f, 495f, "Fast save restart (game)") {alignment = FLabelAlignment.Left, description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable"},
+                new OpLabel(37f, 495f, "Fast save restart (game)") {alignment = FLabelAlignment.Left, description = "(small flashing lights) Press and hold keyind in-game for 1.5 seconds to restart current campaign and skip cutscenes if applicable. Illegal for the All Unlocks Vanilla speedrun"},
 
                 new OpCheckBox(SaintDetPopcorn, 5f, 457f) { description = "Make Saint tutorial popcorn always pop 5 seconds after entering SI_C02 for the first time, as though optimal RNG"},
                 new OpLabel(37f, 460f, "Consistent Saint tutorial popcorn") {alignment = FLabelAlignment.Left, description = "Make Saint tutorial popcorn always pop 5 seconds after entering SI_C02 for the first time, as though optimal RNG"},
@@ -152,7 +152,7 @@ namespace RWSQOL
                 new OpLabel(37f, 285f, "Skip void sea") {alignment = FLabelAlignment.Left, description = "Skip the void sea sequence when the speedrun timer finishes in SB_L01"},
 
                 new OpCheckBox(CustomSaintStomach, 5f, 247f) { description = "Begin Saint's campaign with the selected item in stomach" },
-                new OpLabel(37f, 250f, "Overwrite Saint stomach item") {alignment = FLabelAlignment.Left, description = "Begin Saint's campaign with the selected item in stomach"},
+                new OpLabel(37f, 250f, "Override Saint stomach item") {alignment = FLabelAlignment.Left, description = "Begin Saint's campaign with the selected item in stomach. Does not save to save file unless campaign is completed"},
                 new OpComboBox(CSSItemString, new Vector2(215f, 247f), 150f, CSSList) { description = "Item" },
             };
             mainTab.AddItems(mainTabOptions);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using UnityEngine;
 using Watcher;
+using static MonoMod.InlineRT.MonoModRule;
 
 namespace RWSQOL.Modules
 {
@@ -28,7 +30,9 @@ namespace RWSQOL.Modules
     // However, if we are to die now, none of this is saved to disk, so we must do a save as well. However, by this time, the game has set warpPointTargetAfterWarpPointSave to null.
     // So, we must again set warpPointTargetAfterWarpPointSave, then save everything to file (both the rot state and warpPointTargetAfterWarpPointSave).
     // After this, if the player were to die, warpPointTargetAfterWarpPointSave is set to not null in memory so the player is unnaturally brought to the ripple ladder screen to lose karma.
-    // To fix this, warpPointTargetAfterWarpPointSave is set to null in memory. After this point, the save state should be as the game naturally expects, barring stuff with HI.
+    // To fix this, warpPointTargetAfterWarpPointSave is set to null in memory. We also set the start game condition to load, as happens in most menus (like the karma ladder screen).
+    // The start game condition is imperative to set because of a call in PlayerProgression.GetOrInitiateSaveState, specifically !setup.LoadInitCondition (which checks the load condition).
+    // If this check lands, the game is loaded with an empty save rather than running LoadGameState, where our disk data has a chance to load. After this, the savestate should be as the game expects.
 
     public class WatcherIntroSkip
     {
@@ -87,6 +91,7 @@ namespace RWSQOL.Modules
                 self.saveState.miscWorldSaveData.hasSkippedFirstWarpFatigueTransfer = 1;
 
                 self.saveState.deathPersistentSaveData.reinforcedKarma = KarmaReinforced;
+                
             }
         }
 
@@ -105,13 +110,20 @@ namespace RWSQOL.Modules
             }
             else
             {
-                if (newRoom.game.manager.menuSetup.startGameCondition == ProcessManager.MenuSetup.StoryGameInitCondition.New)
+                if (newRoom.abstractRoom.name.ToLowerInvariant() == Regex.Split(Regex.Split(regionToPO[EntryRegion], "><")[3], "~")[4] && // EEEWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+                    newRoom.game.manager.menuSetup.startGameCondition == ProcessManager.MenuSetup.StoryGameInitCondition.New)
                 {
+
                     newRoom.world.game.GetStorySession.pendingSentientRotInfectionFromWarp = SpreadRot;
                     orig(self, newRoom);
-                    newRoom.world.game.GetStorySession.saveState.warpPointTargetAfterWarpPointSave = CreateSpecialWarpData();
+
+                    WarpPoint.WarpPointData wpData = CreateSpecialWarpData();
+
+                    newRoom.world.game.GetStorySession.saveState.warpPointTargetAfterWarpPointSave = wpData;
+                    newRoom.world.game.GetStorySession.pendingSentientRotInfectionFromWarp = false;
                     newRoom.world.game.rainWorld.progression.SaveWorldStateAndProgression(false);
                     newRoom.world.game.GetStorySession.saveState.warpPointTargetAfterWarpPointSave = null; // gotta keep this null in memory in case the player dies (ripplmode karma ladder screen)
+                    newRoom.world.game.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.Load; // this is so goddamn important I it took me 6 days to find
                 }
                 else
                 {
@@ -135,6 +147,8 @@ namespace RWSQOL.Modules
             WarpPoint.WarpPointData warpPointData = new WarpPoint.WarpPointData(null);
             warpPointData.destPos = stData.destPos;
             warpPointData.RegionString = stData.RegionString;
+            warpPointData.destRegion = stData.destRegion.ToUpperInvariant();
+            warpPointData.sourceTimeline = stData.destTimeline;
             warpPointData.destRoom = stData.destRoom;
             warpPointData.destTimeline = stData.destTimeline;
             warpPointData.panelPos = stData.panelPos;
@@ -148,6 +162,8 @@ namespace RWSQOL.Modules
             }
             warpPointData.cycleSpawnedOn = 0;
             warpPointData.destCam = WarpPoint.GetDestCam(warpPointData);
+            warpPointData.uuidPair = "25683a5f-a972-4c6b-99bc-5860fe654b42"; // idk I just picked one. Needs to be constant for some warpdeferid checks
+
             return warpPointData;
         }
     }

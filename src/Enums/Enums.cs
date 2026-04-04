@@ -14,7 +14,9 @@ namespace RWSQOL.Enums
             WaitingNextTick,
             HoldBegun,
             HoldCompleted,
-            WaitingMenu
+            WaitingMenu,
+            Delay,
+            Delay2
         }
     }
 }
