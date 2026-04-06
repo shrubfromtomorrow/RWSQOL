@@ -12,7 +12,7 @@ using RWSQOL.Modules;
 
 namespace RWSQOL;
 
-[BepInPlugin("shrub.rwsqol", "Speedrunning QOL", "1.0.0")]
+[BepInPlugin("shrub.rwsqol", "Speedrunning QOL", "1.0.1")]
 sealed class Plugin : BaseUnityPlugin
 {
     public static new ManualLogSource Logger;
@@ -53,6 +53,5 @@ sealed class Plugin : BaseUnityPlugin
             FastResetHandler.TriggerReset();
             Plugin.Logger.LogInfo("Reset button pressed");
         }
-
     }
 }

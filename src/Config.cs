@@ -47,6 +47,8 @@ namespace RWSQOL
         ];
         public readonly Configurable<Color> TimerColor;
 
+        private static List<Configurable<bool>> boolPresets;
+
         private UIelement[] mainTabOptions;
         private UIelement[] speedrunTabOptions;
 
@@ -72,11 +74,6 @@ namespace RWSQOL
             ShowTotTime = config.Bind("ShowTotTime", false);
             TimerPosition = config.Bind("TimerPosition", TimerPositions[0]);
             TimerColor = config.Bind("TimerColor", Color.white);
-        }
-
-        public override void Initialize()
-        {
-            base.Initialize();
 
             WISRegionList = new List<ListItem>
             {
@@ -102,6 +99,26 @@ namespace RWSQOL
                 new ListItem("VultureGrub<cA>{ID}<cB>0<cA>SI_SAINTINTRO.-1<cA>", "VultureGrub", 12),
                 new ListItem("{ID}<oB>0<oA>WaterNut<oA>SI_SAINTINTRO.18.5.-1<oA>0<oA>0<oA>0", "WaterNut", 13),
             };
+
+            // Selected for validation hex
+            boolPresets = new List<Configurable<bool>>();
+            boolPresets.AddRange(new[]
+            {
+                FastMenuReset,
+                FastGameReset,
+                SaintDetPopcorn,
+                MoonUncloak,
+                WatcherIntroSkip,
+                WISReinforcedKarma,
+                WISSpreadRot,
+                FixedSkipVoid,
+                CustomSaintStomach
+            });
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
 
             mainTab = new OpTab(this, "Main");
             speedrunTimerTab = new OpTab(this, "Timer Tweaks");
@@ -249,6 +266,61 @@ namespace RWSQOL
                     k3.greyedOut = !CSSValue;
                 }
             }
+        }
+
+        /// <summary>
+        /// Custom hex validation string stolen shamelessly from MMF
+        /// </summary>
+        /// <returns></returns>
+        public override string ValidationString()
+        {
+            string text = "[" + mod.id + "]  ";
+            int num = 0;
+            int num2 = 0;
+            bool flag = true;
+            for (int i = 0; i < boolPresets.Count; i++)
+            {
+                num += (int)Mathf.Pow(2f, (float)(i % 4)) * (boolPresets[i].Value ? 1 : 0);
+                if (i % 4 == 3 || i == boolPresets.Count - 1)
+                {
+                    text += num.ToString("X");
+                    flag = true;
+                    num2++;
+                    if (num2 % 4 == 0)
+                    {
+                        text += "  ";
+                        flag = false;
+                    }
+                    num = 0;
+                }
+            }
+            if (flag)
+            {
+                text += " ";
+            }
+
+            string regionAcro = "";
+            switch (WISRegionString.Value) // ew
+            {
+                case ("Sunbaked Alley"): 
+                    regionAcro = "WSKB";
+                    break;
+                case ("Coral Caves"):
+                    regionAcro = "WRFA";
+                    break;
+                case ("Torrential Railways"):
+                    regionAcro = "WSKA";
+                    break;
+            }
+            text = text + " " + regionAcro;
+            ListItem item = CSSList.FirstOrDefault(x => x.name == CSSItemString.Value); // ewwwwww
+
+            if (item != null)
+            {
+                text = text + " " + item.displayName;
+            }
+
+            return text;
         }
     }
 }
