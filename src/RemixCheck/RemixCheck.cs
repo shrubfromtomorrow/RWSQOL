@@ -136,7 +136,8 @@ namespace RWSQOL.RemixCheck
             for (int i = 0; i < illegalMods.Count; i++)
             {
                 ModManager.Mod mod = illegalMods[i];
-                OpLabel label = new OpLabel(10f + 150f * (i / rowCount), (yAnchor - 25f) - (20f * (i % rowCount)), mod.name.Length > 18 ? (mod.name.Substring(0, 18) + "...") : mod.name);
+                string modString = ((mod.name.Length > 18) && (illegalMods.Count > rowCount)) ? (mod.name.Substring(0, 18) + "...") : mod.name; // if over 18 chars, truncate, but only if multiple columns
+                OpLabel label = new OpLabel(10f + 150f * (i / rowCount), (yAnchor - 25f) - (20f * (i % rowCount)), modString);
                 label.color = GetColor(false);
                 if (mod.id == ModIDs.Remix)
                 {

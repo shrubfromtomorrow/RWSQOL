@@ -93,9 +93,8 @@ namespace RWSQOL.Modules
         }
 
         /// <summary>
-        /// Automatically checks the restart checkbox and fills start game circle for campaign. Also sets a specific bool to allow for autosplitter compatability.
-        /// Triggers only if the FastResetHandler is in a waiting for next tick (reset pressed in menu) or waiting for menu to exist (reset pressed from in-game) phase.
-        /// Is also constrained by a 3 tick delay window to allow time for the autosplitter to write the hasSignalled from the new menu to memory. This is actually set to 10 for better visuals.
+        /// Automatically start the game with the reset button checked to true. If coming from game, remove fadesprite for visibility and wait 10 ticks before beginning circle fill for visuals and autosplitter.
+        /// There is also a 1 tick delay on actually starting the game once the circle is filled for better visuals.
         /// </summary>
         /// <param name="orig"></param>
         /// <param name="self"></param>
@@ -103,39 +102,55 @@ namespace RWSQOL.Modules
         {
             orig(self);
 
-            if (phase == FastResetPhase.WaitingNextTick && FastMenuReset)
+            switch (phase)
             {
-                StartGame(self);
-                return;
-            }
+                case FastResetPhase.WaitingNextTick:
+                    if (FastMenuReset)
+                        TryStart(self, immediate: false);
+                    break;
 
-            if (phase == FastResetPhase.WaitingMenu)
-            {
-                if (!fromGameDelayCounter.isFinished)
-                {
-                    fromGameDelayCounter.Tick();
-                    return;
-                }
+                case FastResetPhase.WaitingMenu:
+                    if (self.manager.fadeSprite != null)
+                        self.manager.fadeSprite.RemoveFromContainer();
 
-                StartGame(self);
-                fromGameDelayCounter.Reset();
+                    if (!fromGameDelayCounter.isFinished)
+                    {
+                        fromGameDelayCounter.Tick();
+                        return;
+                    }
+
+                    fromGameDelayCounter.Reset();
+                    TryStart(self, immediate: false);
+                    break;
+
+                case FastResetPhase.Delay:
+                    TryStart(self, immediate: true);
+                    break;
             }
         }
 
         /// <summary>
-        /// Helper method to separate starting logic from phase control flow.
+        /// Helper for actually starting the game. Fill circle but wait a tick before actually signalling start.
         /// </summary>
         /// <param name="self"></param>
-        private static void StartGame(Menu.SlugcatSelectMenu self)
+        /// <param name="immediate"></param>
+        private static void TryStart(Menu.SlugcatSelectMenu self, bool immediate)
         {
             if (self.manager?.upcomingProcess != null) return;
 
             self.restartCheckbox.Checked = true;
             self.startButton.filled = 1f;
-            self.startButton.hasSignalled = true; // for autosplitter
-            self.Singal(null, "START");
 
-            phase = FastResetPhase.Idle;
+            if (immediate)
+            {
+                self.startButton.hasSignalled = true; // for autosplitter
+                self.Singal(null, "START");
+                phase = FastResetPhase.Idle;
+            }
+            else
+            {
+                phase = FastResetPhase.Delay;
+            }
         }
 
         /// <summary>
@@ -148,7 +163,6 @@ namespace RWSQOL.Modules
         {
             orig(self, manager);
             if (phase != FastResetPhase.WaitingMenu) phase = FastResetPhase.Idle;
-            //else phase = FastResetPhase.WaitingNextTick;
         }
 
         /// <summary>
