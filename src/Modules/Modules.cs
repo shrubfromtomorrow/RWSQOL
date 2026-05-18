@@ -21,6 +21,7 @@ namespace RWSQOL.Modules
             SaintStomachSetup.Apply();
             SpeedrunTimerTweaks.Apply();
             WatcherIntroSkip.Apply();
+            SOCD.Apply();
         }
     }
 }

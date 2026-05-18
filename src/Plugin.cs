@@ -12,7 +12,7 @@ using RWSQOL.Modules;
 
 namespace RWSQOL;
 
-[BepInPlugin("shrub.rwsqol", "Speedrunning QOL", "1.0.3")]
+[BepInPlugin("shrub.rwsqol", "Speedrunning QOL", "1.0.4")]
 sealed class Plugin : BaseUnityPlugin
 {
     public static new ManualLogSource Logger;
@@ -48,10 +48,18 @@ sealed class Plugin : BaseUnityPlugin
 
     public void Update()
     {
-        if (Input.anyKeyDown && Input.GetKeyDown(FastResetHandler.FastResetKey))
+        if (Input.anyKeyDown)
         {
-            FastResetHandler.TriggerReset();
-            Plugin.Logger.LogInfo("Reset button pressed");
+            if (Input.GetKeyDown(FastResetHandler.FastResetKey))
+            {
+                FastResetHandler.TriggerReset();
+                Plugin.Logger.LogInfo("Reset button pressed");
+            }
+            if (Input.GetKeyDown(SOCD.SOCDKey))
+            {
+                SOCD.Toggled = !SOCD.Toggled;
+                Plugin.Logger.LogInfo("Toggled SOCD");
+            }
         }
     }
 }

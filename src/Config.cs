@@ -29,6 +29,8 @@ namespace RWSQOL
         public readonly Configurable<bool> CustomSaintStomach;
         public readonly Configurable<string> CSSItemString;
         public List<ListItem> CSSList;
+        public readonly Configurable<bool> SOCD;
+        public readonly Configurable<KeyCode> SOCDKey;
 
         public readonly Configurable<bool> PreventTimerFading;
         public readonly Configurable<bool> ShowCompletedAndLost;
@@ -66,6 +68,8 @@ namespace RWSQOL
             FixedSkipVoid = config.Bind<bool>("FixedSkipVoid", false);
             CustomSaintStomach = config.Bind<bool>("CustomSaintStomach", false);
             CSSItemString = config.Bind<string>("CSSItemString", "Lantern");
+            SOCD = config.Bind<bool>("SOCD", true);
+            SOCDKey = config.Bind<KeyCode>("SOCDKey", KeyCode.Y);
 
             PreventTimerFading = config.Bind("PreventTimerFading", false);
             ShowCompletedAndLost = config.Bind("ShowCompletedAndLost", false);
@@ -112,7 +116,8 @@ namespace RWSQOL
                 WISReinforcedKarma,
                 WISSpreadRot,
                 FixedSkipVoid,
-                CustomSaintStomach
+                CustomSaintStomach,
+                SOCD
             });
         }
 
@@ -171,6 +176,10 @@ namespace RWSQOL
                 new OpCheckBox(CustomSaintStomach, 5f, 247f) { description = "Begin Saint's campaign with the selected item in stomach" },
                 new OpLabel(37f, 250f, "Override Saint stomach item") {alignment = FLabelAlignment.Left, description = "Begin Saint's campaign with the selected item in stomach. Does not save to save file unless campaign is completed"},
                 new OpComboBox(CSSItemString, new Vector2(215f, 247f), 150f, CSSList) { description = "Item" },
+
+                new OpCheckBox(SOCD, 5f, 212f) { description = "(Simultaneous Opposite Cardinal Directions) The most recently pressed input is the one the game reads when holding opposite directions: up/down, left/right" },
+                new OpLabel(37f, 215f, "SOCD") {alignment = FLabelAlignment.Left, description = "(Simultaneous Opposite Cardinal Directions) The most recently pressed input is the one the game reads when holding opposite directions: up/down, left/right"},
+                new OpKeyBinder(SOCDKey, new Vector2(79f, 210f), new Vector2(120f, 20f), true, OpKeyBinder.BindController.AnyController) { description = "Keybind for SOCD toggle" },
             };
             mainTab.AddItems(mainTabOptions);
 
@@ -216,6 +225,8 @@ namespace RWSQOL
 
             bool CSSValue = false;
 
+            bool SOCDValue = false;
+
             foreach (var item in Tabs[0].items)
             {
                 if (item is OpCheckBox b)
@@ -224,6 +235,7 @@ namespace RWSQOL
                     if (b.cfgEntry == FastMenuReset) fastMenuResetValue = b.GetValueBool();
                     if (b.cfgEntry == WatcherIntroSkip) WISValue = b.GetValueBool();
                     if (b.cfgEntry == CustomSaintStomach) CSSValue = b.GetValueBool();
+                    if (b.cfgEntry == SOCD) SOCDValue = b.GetValueBool();
                 }
                 if (item is OpComboBox b2)
                 {
@@ -244,9 +256,13 @@ namespace RWSQOL
                 {
                     k.greyedOut = !(fastGameResetValue || fastMenuResetValue);
                 }
-                if (item is OpComboBox k2 && k2.cfgEntry == WISRegionString)
+                if (item is OpKeyBinder k2 && k2.cfgEntry == SOCDKey)
                 {
-                    k2.greyedOut = !WISValue;
+                    k2.greyedOut = !SOCDValue;
+                }
+                if (item is OpComboBox c && c.cfgEntry == WISRegionString)
+                {
+                    c.greyedOut = !WISValue;
                 }
                 if (item is OpCheckBox b && (b.cfgEntry == WISReinforcedKarma || b.cfgEntry == WISSpreadRot))
                 {
@@ -261,9 +277,9 @@ namespace RWSQOL
                     }
                     else b2.greyedOut = !WISValue;
                 }
-                if (item is OpComboBox k3 && k3.cfgEntry == CSSItemString)
+                if (item is OpComboBox c2 && c2.cfgEntry == CSSItemString)
                 {
-                    k3.greyedOut = !CSSValue;
+                    c2.greyedOut = !CSSValue;
                 }
             }
         }
