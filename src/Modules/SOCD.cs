@@ -54,15 +54,10 @@ namespace RWSQOL.Modules
                     var controls = p.room?.game?.rainWorld?.options?.controls[0];
                     if (controls == null) return;
 
-                    KeyCode left = controls.KeyboardLeft;
-                    KeyCode right = controls.KeyboardRight;
-                    KeyCode down = controls.KeyboardDown;
-                    KeyCode up = controls.KeyboardUp;
-
-                    bool leftHeld = Input.GetKey(left);
-                    bool rightHeld = Input.GetKey(right);
-                    bool upHeld = Input.GetKey(up);
-                    bool downHeld = Input.GetKey(down);
+                    bool leftHeld = Input.GetKey(controls.KeyboardLeft);
+                    bool rightHeld = Input.GetKey(controls.KeyboardRight);
+                    bool upHeld = Input.GetKey(controls.KeyboardUp);
+                    bool downHeld = Input.GetKey(controls.KeyboardDown);
 
                     int frame = Time.frameCount;
 
@@ -78,11 +73,8 @@ namespace RWSQOL.Modules
                     prevDownHeld = downHeld;
 
                     // readabilityminning but performancemaxxing. Basically if opposite held, use the newer input
-                    int x = (leftHeld == rightHeld) ? (leftHeld ? (lastLeftFrame > lastRightFrame ? -1 : 1) : 0) : (leftHeld ? -1 : 1);
-                    int y = (upHeld == downHeld) ? (upHeld ? (lastUpFrame > lastDownFrame ? 1 : -1) : 0) : (upHeld ? 1 : -1);
-
-                    p.input[0].x = x;
-                    p.input[0].y = y;
+                    p.input[0].x = (leftHeld == rightHeld) ? (leftHeld ? (lastLeftFrame > lastRightFrame ? -1 : 1) : 0) : (leftHeld ? -1 : 1);
+                    p.input[0].y = (upHeld == downHeld) ? (upHeld ? (lastUpFrame > lastDownFrame ? 1 : -1) : 0) : (upHeld ? 1 : -1);
                 });
             }
             else
