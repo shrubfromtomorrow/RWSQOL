@@ -52,7 +52,7 @@ namespace RWSQOL.Modules
                 {
                     if (!MenuToggle || !Toggled) return;
                     var controls = p.room?.game?.rainWorld?.options?.controls[0];
-                    if (controls == null) return;
+                    if (controls == null || controls.recentController.type != Rewired.ControllerType.Keyboard) return;
 
                     bool leftHeld = Input.GetKey(controls.KeyboardLeft);
                     bool rightHeld = Input.GetKey(controls.KeyboardRight);
@@ -72,9 +72,17 @@ namespace RWSQOL.Modules
                     prevUpHeld = upHeld;
                     prevDownHeld = downHeld;
 
+                    int currX = p.input[0].x;
+                    int currY = p.input[0].y;
+                    int currDownDiag = p.input[0].downDiagonal;
+                    float anCurrX = p.input[0].analogueDir.x;
+                    float anCurrY = p.input[0].analogueDir.y;
                     // readabilityminning but performancemaxxing. Basically if opposite held, use the newer input
-                    p.input[0].x = (leftHeld == rightHeld) ? (leftHeld ? (lastLeftFrame > lastRightFrame ? -1 : 1) : 0) : (leftHeld ? -1 : 1);
-                    p.input[0].y = (upHeld == downHeld) ? (upHeld ? (lastUpFrame > lastDownFrame ? 1 : -1) : 0) : (upHeld ? 1 : -1);
+                    p.input[0].x = (leftHeld == rightHeld) ? (leftHeld ? (lastLeftFrame > lastRightFrame ? -1 : 1) : currX) : currX;
+                    p.input[0].y = (upHeld == downHeld) ? (upHeld ? (lastUpFrame > lastDownFrame ? 1 : -1) : currY) : currY;
+                    p.input[0].downDiagonal = (leftHeld == rightHeld) ? (leftHeld ? (lastLeftFrame > lastRightFrame ? -1 : 1) : currDownDiag) : currDownDiag;
+                    p.input[0].analogueDir.x = (leftHeld == rightHeld) ? (leftHeld ? (lastLeftFrame > lastRightFrame ? -1 : 1) : anCurrX) : anCurrX;
+                    p.input[0].analogueDir.y = (upHeld == downHeld) ? (upHeld ? (lastUpFrame > lastDownFrame ? 1 : -1) : anCurrY) : anCurrY;
                 });
             }
             else
