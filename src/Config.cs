@@ -31,6 +31,7 @@ namespace RWSQOL
         public List<ListItem> CSSList;
         public readonly Configurable<bool> SOCD;
         public readonly Configurable<KeyCode> SOCDKey;
+        public readonly Configurable<bool> Debug;
 
         public readonly Configurable<bool> PreventTimerFading;
         public readonly Configurable<bool> ShowCompletedAndLost;
@@ -52,7 +53,7 @@ namespace RWSQOL
         private static List<Configurable<bool>> boolPresets;
 
         private UIelement[] mainTabOptions;
-        private UIelement[] speedrunTabOptions;
+        private UIelement[] speedrunTimerTabOptions;
 
         public Config()
         {
@@ -68,8 +69,10 @@ namespace RWSQOL
             FixedSkipVoid = config.Bind<bool>("FixedSkipVoid", false);
             CustomSaintStomach = config.Bind<bool>("CustomSaintStomach", false);
             CSSItemString = config.Bind<string>("CSSItemString", "Lantern");
-            SOCD = config.Bind<bool>("SOCD", true);
+            SOCD = config.Bind<bool>("SOCD", false);
             SOCDKey = config.Bind<KeyCode>("SOCDKey", KeyCode.Y);
+            Debug = config.Bind<bool>("Debug", false);
+
 
             PreventTimerFading = config.Bind("PreventTimerFading", false);
             ShowCompletedAndLost = config.Bind("ShowCompletedAndLost", false);
@@ -117,7 +120,8 @@ namespace RWSQOL
                 WISSpreadRot,
                 FixedSkipVoid,
                 CustomSaintStomach,
-                SOCD
+                SOCD,
+                Debug
             });
         }
 
@@ -180,10 +184,13 @@ namespace RWSQOL
                 new OpCheckBox(SOCD, 5f, 212f) { description = "(Simultaneous Opposite Cardinal Directions) The most recently pressed input is the one the game reads when holding opposite directions: up/down, left/right" },
                 new OpLabel(37f, 215f, "SOCD") {alignment = FLabelAlignment.Left, description = "(Simultaneous Opposite Cardinal Directions) The most recently pressed input is the one the game reads when holding opposite directions: up/down, left/right"},
                 new OpKeyBinder(SOCDKey, new Vector2(79f, 210f), new Vector2(120f, 20f), true, OpKeyBinder.BindController.AnyController) { description = "Keybind for SOCD toggle" },
+
+                new OpCheckBox(Debug, 5f, 177f) { description = "Log various pieces of debugging information to LogOutput.log" },
+                new OpLabel(37f, 180f, "Debug") {alignment = FLabelAlignment.Left, description = "Log various pieces of debugging information to LogOutput.log"},
             };
             mainTab.AddItems(mainTabOptions);
 
-            speedrunTabOptions = new UIelement[]
+            speedrunTimerTabOptions = new UIelement[]
             {
                 timerTitle,
                 timerSeparator,
@@ -209,7 +216,7 @@ namespace RWSQOL
                 new OpLabel(365f, 528f, "Timer Color") {alignment = FLabelAlignment.Left, description = "Set a custom speedrun timer color"},
                 new OpColorPicker(TimerColor, new Vector2(440f, 395f)) { description = "Set a custom speedrun timer color"},
             };
-            speedrunTimerTab.AddItems(speedrunTabOptions);
+            speedrunTimerTab.AddItems(speedrunTimerTabOptions);
         } 
 
         public override void Update()

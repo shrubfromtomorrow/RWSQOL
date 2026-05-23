@@ -22,6 +22,7 @@ namespace RWSQOL.Modules
             SpeedrunTimerTweaks.Apply();
             WatcherIntroSkip.Apply();
             SOCD.Apply();
+            Debug.Apply();
         }
     }
 }

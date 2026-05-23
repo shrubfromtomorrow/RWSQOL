@@ -12,7 +12,7 @@ using RWSQOL.Modules;
 
 namespace RWSQOL;
 
-[BepInPlugin("shrub.rwsqol", "Speedrunning QOL", "1.0.5")]
+[BepInPlugin("shrub.rwsqol", "Speedrunning QOL", "1.0.6")]
 sealed class Plugin : BaseUnityPlugin
 {
     public static new ManualLogSource Logger;
