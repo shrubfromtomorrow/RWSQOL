@@ -78,11 +78,11 @@ namespace RWSQOL.Modules
                     float anCurrX = p.input[0].analogueDir.x;
                     float anCurrY = p.input[0].analogueDir.y;
                     // readabilityminning but performancemaxxing. Basically if opposite held, use the newer input
-                    p.input[0].x = (leftHeld == rightHeld) ? (leftHeld ? (lastLeftFrame > lastRightFrame ? -1 : 1) : currX) : currX;
-                    p.input[0].y = (upHeld == downHeld) ? (upHeld ? (lastUpFrame > lastDownFrame ? 1 : -1) : currY) : currY;
-                    p.input[0].downDiagonal = (leftHeld == rightHeld) ? (leftHeld ? (lastLeftFrame > lastRightFrame ? -1 : 1) : currDownDiag) : currDownDiag;
-                    p.input[0].analogueDir.x = (leftHeld == rightHeld) ? (leftHeld ? (lastLeftFrame > lastRightFrame ? -1 : 1) : anCurrX) : anCurrX;
-                    p.input[0].analogueDir.y = (upHeld == downHeld) ? (upHeld ? (lastUpFrame > lastDownFrame ? 1 : -1) : anCurrY) : anCurrY;
+                    p.input[0].x = (leftHeld && rightHeld) ? (lastLeftFrame > lastRightFrame ? -1 : 1) : currX;
+                    p.input[0].y = (upHeld && downHeld) ? (lastUpFrame > lastDownFrame ? 1 : -1) : currY;
+                    p.input[0].downDiagonal = (leftHeld && rightHeld || upHeld && downHeld) ? (p.input[0].y == -1 || p.input[0].y == 0 && p.input[0].analogueDir.y < -0.05 ? (p.input[0].x == 0 && Mathf.Abs(p.input[0].analogueDir.x) > 0.05f ? (int)Mathf.Sign(p.input[0].analogueDir.x) : p.input[0].x) : 0) : currDownDiag;
+                    p.input[0].analogueDir.x = (leftHeld && rightHeld) ? (lastLeftFrame > lastRightFrame ? -1 : 1) : anCurrX;
+                    p.input[0].analogueDir.y = (upHeld && downHeld) ? (lastUpFrame > lastDownFrame ? 1 : -1) : anCurrY;
                 });
             }
             else
